@@ -4,4 +4,6 @@ import {Batches} from '@/resources.ts';
 
 export const GAME = new Engine(Config);
 
-GAME.start(Batches.Main);
+GAME.start(Batches.Main).then(() => {
+    GAME.goToScene('level');
+});

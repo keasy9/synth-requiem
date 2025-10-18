@@ -11,6 +11,7 @@ class SpriteBuilder {
     protected _offsetLeft: number = 0;
     protected _offsetTop: number = 0;
     protected _frames: SourceView[] = [];
+    protected _isVertical: boolean = false;
 
     public constructor() {}
 
@@ -76,8 +77,8 @@ class SpriteBuilder {
     /**
      * Автоматически рассчитать ширину кадра на основе других параметров.
      */
-    public autoWidth(rows: number): this {
-        this._rows = rows;
+    public autoWidth(cols: number): this {
+        this._cols = cols;
         this._width = undefined;
         return this;
     }
@@ -93,8 +94,8 @@ class SpriteBuilder {
     /**
      * Автоматически рассчитать высоту кадра на основе других параметров.
      */
-    public autoHeight(cols: number): this {
-        this._cols = cols;
+    public autoHeight(rows: number): this {
+        this._rows = rows;
         this._height = undefined;
         return this;
     }
@@ -184,16 +185,19 @@ class SpriteBuilder {
     }
 
     /**
-     * Создать спрайт с одним кадром.
+     * Создать один кадр.
      */
     public one(index: number = 0): Sprite {
         this.computeSizesIfNeeded();
 
-        const colSpanOffset = index === 0 ? 0 : this._colSpan * (index - 1);
-        const x = (this._width! * (index)) - colSpanOffset
+        const currentRow = Math.floor(index / this._cols!);
+        const currentCol = index - (currentRow * this._cols!);
 
-        const rowSpanOffset = index === 0 ? 0 : this._rowSpan * (index - 1);
-        const y = (this._height! * (index)) - rowSpanOffset
+        const colSpanOffset = currentCol === 0 ? 0 : this._colSpan * (currentCol - 1);
+        const x = (this._width! * (currentCol)) - colSpanOffset
+
+        const rowSpanOffset = currentRow === 0 ? 0 : this._rowSpan * (currentRow - 1);
+        const y = (this._height! * (currentRow)) - rowSpanOffset
 
         return new Sprite({
             image: this._image!,
@@ -225,7 +229,7 @@ class SpriteBuilder {
         else if (from < 0) from = 0;
 
         const indexes: number[] = [];
-        for (let i = from; i <= to; i++) {
+        for (let i = from; i <= to-1; i++) {
             indexes.push(i);
         }
 
@@ -241,7 +245,8 @@ class SpriteBuilder {
 }
 
 /**
- * Создать спрайт из картинки.
+ * Создать спрайт из картинки. Автоматически умеет рассчитывать размер кадра когда передано их кол-во и наоборот.
+ * Режет кадры слева направо сверху вниз
  */
 export function sprite(image: ImageSource) {
     return new SpriteBuilder().image(image);
