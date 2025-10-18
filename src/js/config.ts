@@ -1,4 +1,4 @@
-import {Color, DisplayMode} from 'excalibur';
+import {Color, DisplayMode, ImageFiltering} from 'excalibur';
 import {level} from '@/scenes/Level.ts';
 
 const width = 128;
@@ -9,14 +9,16 @@ if (!canvasElem || !(canvasElem instanceof HTMLCanvasElement)) throw new Error('
 
 const scale = Math.ceil(
     Math.max(canvasElem.offsetWidth / width, canvasElem.offsetHeight / height)
-) * (window.devicePixelRatio ?? 1);
+) * (window.devicePixelRatio);
 
 export const Config = {
     width: width,
     height: height,
     displayMode: DisplayMode.FitScreenAndFill,
     pixelArt: true,
-    pixelRatio: scale + 1,
+    antialiasing: false,
+    filtering: ImageFiltering.Pixel,
+    pixelRatio: scale,
     backgroundColor: Color.Black,
     canvasElement: canvasElem,
     scenes: {

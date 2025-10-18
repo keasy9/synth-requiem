@@ -2,10 +2,14 @@ import {Engine, Entity, GraphicsComponent, GraphicsGroup, TransformComponent, ve
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 
-export class ParallaxBackground extends Entity {
+export class ParallaxBackground extends Entity<TransformComponent> {
     protected speed = .005;
     protected layers: Entity<GraphicsComponent | TransformComponent>[] = [];
     protected layerScale = 1.1;  // фон должен быть шире игры чтобы можно было его прокручивать по x
+
+    public constructor() {
+        super([new TransformComponent()]);
+    }
 
 
     public onInitialize(_engine: Engine) {

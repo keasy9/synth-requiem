@@ -1,4 +1,4 @@
-import {type ImageSource, type SourceView, Sprite, SpriteSheet} from 'excalibur';
+import {Animation, AnimationStrategy, type ImageSource, range, type SourceView, Sprite, SpriteSheet} from 'excalibur';
 
 class SpriteBuilder {
     protected _image?: ImageSource;
@@ -11,7 +11,10 @@ class SpriteBuilder {
     protected _offsetLeft: number = 0;
     protected _offsetTop: number = 0;
     protected _frames: SourceView[] = [];
-    protected _isVertical: boolean = false;
+    protected _from: number = 0;
+    protected _to?: number;
+    protected _indexes: number[] = [];
+    protected _row?: number;
 
     public constructor() {}
 
@@ -126,6 +129,64 @@ class SpriteBuilder {
     }
 
     /**
+     * С какого кадра начинать резать спрайт.
+     */
+    public from(index: number): this {
+        this._from = index;
+        return this;
+    }
+
+    /**
+     * Резать спрайт с первого кадра.
+     */
+    public fromStart(): this {
+        this._row = undefined;
+        this._from = 0;
+        return this;
+    }
+
+    /**
+     * До какого кадра резать спрайт.
+     */
+    public to(index: number): this {
+        this._row = undefined;
+        this._to = index;
+        return this;
+    }
+
+    /**
+     * Резать спрайт до последнего кадра.
+     */
+    public toEnd(): this {
+        this._to = undefined;
+        return this;
+    }
+
+    /**
+     * Вырезать только указанные кадры.
+     */
+    public only(...indexes: number[]): this {
+        this._indexes = indexes;
+        return this;
+    }
+
+    /**
+     * Добавить кадр к целевым.
+     */
+    public pushIndex(index: number): this {
+        this._indexes.push(index);
+        return this;
+    }
+
+    /**
+     * Вырезать только кадры в определённой строке.
+     */
+    public row(row: number): this {
+        this._row = row;
+        return this;
+    }
+
+    /**
      * Если указана ширина кадра, но не кол-во колонок, или наоборот, вычисляет одно на основе другого.
      * Делает то же самое для высоты кадра и кол-ва строк.
      */
@@ -151,7 +212,41 @@ class SpriteBuilder {
         } else if (this._width) {
             this._cols ??= Math.floor(this._image.width - (this._offsetLeft * 2) + this._colSpan) / (this._width + this._colSpan);
         }
+    }
 
+    /**
+     * Если указан диапазон кадров или строка, вычислит индексы кадров. Вызывать только после computeSizesIfNeeded.
+     */
+    protected computeIndexesIfNeeded(): void {
+        if (this._row) {
+            this._from = this._cols! * (this._row - 1);
+            this._to = this._from + this._cols! - 1;
+        }
+
+        if (this._to) this._indexes = range(this._from, this._to);
+    }
+
+    /**
+     * Рассчитает конфигурации кадров из индексов. Вызывать только после computeSizesIfNeeded.
+     */
+    protected computeFramesFromIndexes(): void {
+        this._frames = this._indexes.map(index => {
+            const currentRow = Math.floor(index / this._cols!);
+            const currentCol = index - (currentRow * this._cols!);
+
+            const colSpanOffset = currentCol === 0 ? 0 : this._colSpan * (currentCol - 1);
+            const x = (this._width! * (currentCol)) - colSpanOffset
+
+            const rowSpanOffset = currentRow === 0 ? 0 : this._rowSpan * (currentRow - 1);
+            const y = (this._height! * (currentRow)) - rowSpanOffset
+
+            return {
+                x: x + this._offsetLeft,
+                y: y + this._offsetTop,
+                width: this._width!,
+                height: this._height!,
+            };
+        });
     }
 
     /**
@@ -168,6 +263,15 @@ class SpriteBuilder {
         }
 
         this.computeSizesIfNeeded();
+        this.computeIndexesIfNeeded();
+
+        if (this._indexes.length) {
+            this.computeFramesFromIndexes();
+            return SpriteSheet.fromImageSourceWithSourceViews({
+                image: this._image,
+                sourceViews: this._frames,
+            });
+        }
 
         return SpriteSheet.fromImageSource({
             image: this._image,
@@ -182,6 +286,14 @@ class SpriteBuilder {
                 margin: { x: this._colSpan, y: this._rowSpan },
             },
         });
+    }
+
+    /**
+     * Создать анимацию. Если кадры не указаны, будут использованы все кадры
+     */
+    public anim(type: AnimationStrategy = AnimationStrategy.Freeze, frameDuration: number = 300): Animation {
+        const sheet = this.sheet();
+        return Animation.fromSpriteSheet(sheet, range(0, sheet.sprites.length - 1), frameDuration, type);
     }
 
     /**
@@ -222,24 +334,22 @@ class SpriteBuilder {
 
         this.computeSizesIfNeeded();
 
-        if (to === undefined) to = from ?? this._cols!;
-        else if (to > this._cols!) to = this._cols!;
-
-        if (from === undefined) from = 0;
-        else if (from < 0) from = 0;
-
-        const indexes: number[] = [];
-        for (let i = from; i <= to-1; i++) {
-            indexes.push(i);
+        if (from === undefined) {
+            to = this._to ?? (this._cols! - 1);
+            from = this._from ?? 0;
+        } else if (to === undefined) {
+            to = from;
+            from = this._from ?? 0;
         }
 
-        return this.many(indexes);
+        return this.many(range(from, to));
     }
 
     /**
      * Создать массив кадров.
      */
     public all(): Sprite[] {
+        this._indexes = [];
         return this.many();
     }
 }
