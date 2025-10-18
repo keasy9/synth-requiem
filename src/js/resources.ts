@@ -1,8 +1,10 @@
 import {ImageSource} from 'excalibur';
 import {Intro} from '@/loaders/Intro.ts';
+import {Default} from '@/loaders/Default.ts';
 
 export const Resources = {
     SpriteBackground: new ImageSource('./assets/sprites/space.png'),
+    SpritePlayers: new ImageSource('./assets/sprites/players.png'),
 } as const;
 
 // ресурсы которые нужны сразу после старта игры или на протяжении всей игры
@@ -11,6 +13,13 @@ mainBatch.addResources([
     Resources.SpriteBackground,
 ]);
 
+// ресурсы, которые нужны для игровых уровней
+const levelBatch = new Default();
+levelBatch.addResources([
+    Resources.SpritePlayers,
+]);
+
 export const Batches = {
     Main: mainBatch,
+    Level: levelBatch,
 } as const;

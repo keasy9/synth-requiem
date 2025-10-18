@@ -3,7 +3,7 @@ import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 
 export class ParallaxBackground extends Entity {
-    protected speed = .01;
+    protected speed = .005;
     protected layers: Entity<GraphicsComponent | TransformComponent>[] = [];
     protected layerScale = 1.1;  // фон должен быть шире игры чтобы можно было его прокручивать по x
 

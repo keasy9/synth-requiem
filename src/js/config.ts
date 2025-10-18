@@ -5,7 +5,7 @@ const width = 128;
 const height = 256;
 
 const canvasElem = document.getElementById('canvas');
-if (!canvasElem) throw new Error('Canvas не найден!');
+if (!canvasElem || !(canvasElem instanceof HTMLCanvasElement)) throw new Error('Canvas не найден!');
 
 const scale = Math.ceil(
     Math.max(canvasElem.offsetWidth / width, canvasElem.offsetHeight / height)
