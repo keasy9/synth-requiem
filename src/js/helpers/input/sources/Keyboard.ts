@@ -2,7 +2,7 @@ import {type ActionKey, Actions, type InputSource} from '@/helpers/input/sources
 import {Keys} from 'excalibur';
 import {GAME} from '@/main.ts';
 
-type KeyboardBindings = Record<ActionKey, Keys[]>;
+type KeyboardBindings = Partial<Record<ActionKey, Keys[]>>;
 
 export class Keyboard implements InputSource {
     protected keyBindings: KeyboardBindings
@@ -15,8 +15,8 @@ export class Keyboard implements InputSource {
         [Actions.Fire]: [Keys.Space],
     };
 
-    public constructor(bindings?: KeyboardBindings) {
-        this.keyBindings = bindings ?? Keyboard.defaultKeyBindings;
+    public constructor(bindings: KeyboardBindings = {} as KeyboardBindings) {
+        this.keyBindings = Object.assign(Keyboard.defaultKeyBindings, bindings);
     }
 
     protected isAction(action: ActionKey, method: 'wasPressed' | 'isHeld' | 'wasReleased'): boolean {
