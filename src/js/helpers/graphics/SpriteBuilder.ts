@@ -291,8 +291,9 @@ class SpriteBuilder {
     /**
      * Создать анимацию. Если кадры не указаны, будут использованы все кадры
      */
-    public anim(type: AnimationStrategy = AnimationStrategy.Freeze, frameDuration: number = 300): Animation {
+    public anim(type: AnimationStrategy = AnimationStrategy.Freeze, frameDuration: number = 100): Animation {
         const sheet = this.sheet();
+        console.log(sheet.sprites.map(s => s.sourceView))
         return Animation.fromSpriteSheet(sheet, range(0, sheet.sprites.length - 1), frameDuration, type);
     }
 

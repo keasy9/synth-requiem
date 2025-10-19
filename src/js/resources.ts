@@ -5,6 +5,7 @@ import {Default} from '@/loaders/Default.ts';
 export const Resources = {
     SpriteBackground: new ImageSource('./assets/sprites/space.png'),
     SpritePlayers: new ImageSource('./assets/sprites/players.png'),
+    SpriteExhausts: new ImageSource('./assets/sprites/exhaust.png'),
 } as const;
 
 // ресурсы которые нужны сразу после старта игры или на протяжении всей игры
@@ -17,6 +18,7 @@ mainBatch.addResources([
 const levelBatch = new Default();
 levelBatch.addResources([
     Resources.SpritePlayers,
+    Resources.SpriteExhausts,
 ]);
 
 export const Batches = {

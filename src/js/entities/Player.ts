@@ -1,4 +1,12 @@
-import {Actor, type Animation, type Engine, vec} from 'excalibur';
+import {
+    Actor,
+    type Animation,
+    AnimationStrategy,
+    type Engine,
+    GraphicsGroup,
+    type GraphicsGrouping,
+    vec,
+} from 'excalibur';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import type {InputPlayer} from '@/helpers/input/InputPlayer.ts';
@@ -29,6 +37,25 @@ export class Player extends Actor {
         this.input = inputPlayer(0);
     }
 
+    protected makeExhaust(): GraphicsGrouping[] {
+        switch (this.type) {
+            case PlayerType.White:
+                return [{
+                    useBounds: false,
+                    graphic: sprite(Resources.SpriteExhausts)
+                        .cols(8)
+                        .rows(3)
+                        .from(8)
+                        .to(11)
+                        .anim(AnimationStrategy.Loop, 80),
+                    offset: vec(3, 7),
+                }];
+                // todo выхлоп для других типов игроков
+            default:
+                return [];
+        }
+    }
+
     public onInitialize(_engine: Engine) {
         this.sprite = sprite(Resources.SpritePlayers)
             .autoWidth(3)
@@ -39,10 +66,15 @@ export class Player extends Actor {
         this.sprite.pause();
         this.sprite.goToFrame(1);
 
-        this.graphics.use(this.sprite);
+        this.graphics.use(new GraphicsGroup({
+            members: [
+                this.sprite,
+                ...this.makeExhaust(),
+            ],
+        }));
     }
 
-    public onPreUpdate(engine: Engine, elapsed: number) {
+    public onPreUpdate(_engine: Engine, _elapsed: number) {
         const velocity = vec(0, 0);
 
         if (this.input.is(Actions.Left)) velocity.x--;
