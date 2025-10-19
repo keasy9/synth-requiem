@@ -1,5 +1,5 @@
 import type {ActionKey, InputSource} from '@/helpers/input/sources/InputSource.ts';
-import {Actions} from '@/helpers/input/sources/InputSource.ts';
+import {Actions, InputSourceType} from '@/helpers/input/sources/InputSource.ts';
 import {Axes, Buttons} from 'excalibur';
 import {GAME} from '@/main.ts';
 
@@ -10,7 +10,7 @@ const AxisDirection = {
 
 type AxisDirectionKey = typeof AxisDirection[keyof typeof AxisDirection];
 
-type GamepadBindings = {
+export type GamepadBindings = {
     buttons: Partial<Record<ActionKey, Buttons[]>>,
     axes: Partial<Record<ActionKey, {
         axis: Axes,
@@ -22,6 +22,8 @@ export class Gamepad implements InputSource {
     protected index: number;
     protected buttonBindings: GamepadBindings['buttons'];
     protected axisBindings: GamepadBindings['axes'];
+
+    public readonly type = InputSourceType.Gamepad;
 
     public static defaultButtonBindings: GamepadBindings['buttons'] = {
         [Actions.Fire]: [Buttons.LeftTrigger, Buttons.RightTrigger],

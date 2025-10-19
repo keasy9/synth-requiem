@@ -1,11 +1,13 @@
-import {type ActionKey, Actions, type InputSource} from '@/helpers/input/sources/InputSource.ts';
+import {type ActionKey, Actions, type InputSource, InputSourceType} from '@/helpers/input/sources/InputSource.ts';
 import {Keys} from 'excalibur';
 import {GAME} from '@/main.ts';
 
-type KeyboardBindings = Partial<Record<ActionKey, Keys[]>>;
+export type KeyboardBindings = Partial<Record<ActionKey, Keys[]>>;
 
 export class Keyboard implements InputSource {
     protected keyBindings: KeyboardBindings
+
+    public readonly type = InputSourceType.Keyboard;
 
     public static defaultKeyBindings: KeyboardBindings = {
         [Actions.Left]: [Keys.Left, Keys.A],

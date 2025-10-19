@@ -8,9 +8,16 @@ export const Actions = {
 
 export type ActionKey = typeof Actions[keyof typeof Actions];
 
-// todo описать pointer от этого интерфейса. Его скорее всего разделять между игроками придётся по областям экрана
-// todo класс InputPlayer - содержит в себе InputSource'ы
+export const InputSourceType = {
+    Keyboard: 'keyboard',
+    Gamepad: 'gamepad',
+    // todo pointer
+} as const;
+
+export type InputSourceTypeKey = typeof InputSourceType[keyof typeof InputSourceType];
+
 export interface InputSource {
+    readonly type: InputSourceTypeKey;
     started(action: ActionKey): boolean;
     is(action: ActionKey): boolean;
     ended(action: ActionKey): boolean;
