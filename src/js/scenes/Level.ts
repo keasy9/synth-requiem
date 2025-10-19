@@ -3,14 +3,17 @@ import {ParallaxBackground} from '@/entities/ParallaxBackground.ts';
 import {Batches} from '@/resources.ts';
 import {Player} from '@/entities/Player.ts';
 import {Config} from '@/config.ts';
+import {WorldBounds} from '@/entities/WorldBounds.ts';
 
 class Level extends Scene {
     protected bg: ParallaxBackground;
-    protected player: Player
+    protected player: Player;
+    protected bounds: WorldBounds;
 
     public constructor() {
         super();
 
+        this.bounds = new WorldBounds();
         this.bg = new ParallaxBackground();
         this.player = new Player();
     }
@@ -20,6 +23,8 @@ class Level extends Scene {
 
         this.player.pos = vec(Config.width / 2, Config.height * .9);
         this.player.z = 1;
+
+        this.add(this.bounds);
 
         this.add(this.bg);
         this.add(this.player);

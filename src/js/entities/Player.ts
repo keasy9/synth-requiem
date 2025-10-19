@@ -2,6 +2,7 @@ import {
     Actor,
     type Animation,
     AnimationStrategy,
+    CollisionType,
     type Engine,
     GraphicsGroup,
     type GraphicsGrouping,
@@ -31,7 +32,11 @@ export class Player extends Actor {
     protected maxSpeed = 50;
 
     public constructor(type: PlayerTypeKey = PlayerType.White) {
-        super();
+        super({
+            collisionType: CollisionType.Active,
+            width: 8,
+            height: 8,
+        });
 
         this.type = type;
         this.input = inputPlayer(0);

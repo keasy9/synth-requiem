@@ -293,7 +293,6 @@ class SpriteBuilder {
      */
     public anim(type: AnimationStrategy = AnimationStrategy.Freeze, frameDuration: number = 100): Animation {
         const sheet = this.sheet();
-        console.log(sheet.sprites.map(s => s.sourceView))
         return Animation.fromSpriteSheet(sheet, range(0, sheet.sprites.length - 1), frameDuration, type);
     }
 
