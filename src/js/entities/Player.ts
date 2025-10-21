@@ -6,7 +6,7 @@ import {
     type Engine,
     GraphicsGroup,
     type GraphicsGrouping,
-    vec,
+    vec, Vector,
 } from 'excalibur';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
@@ -92,5 +92,13 @@ export class Player extends Actor {
         else this.sprite?.goToFrame(1);
 
         this.body.vel = velocity.normalize().scaleEqual(this.maxSpeed);
+    }
+
+    public getSpeed(): Vector {
+        return this.body.vel;
+    }
+
+    public getPosition(): Vector {
+        return this.body.pos;
     }
 }

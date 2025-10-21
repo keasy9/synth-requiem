@@ -31,6 +31,11 @@ class Level extends Scene {
         this.add(this.bounds);
         this.add(this.player);
     }
+
+    public onPreUpdate(_engine: Engine, _elapsed: number) {
+        this.bg.speedupFromSpeed(-this.player.getSpeed().y)
+            .setOffsetFromPosition(this.player.getPosition().x);
+    }
 }
 
 export const level = {
