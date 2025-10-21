@@ -13,20 +13,22 @@ class Level extends Scene {
     public constructor() {
         super();
 
-        this.bounds = new WorldBounds();
         this.bg = new ParallaxBackground();
+        this.bounds = new WorldBounds();
         this.player = new Player();
     }
 
     public onInitialize(_engine: Engine) {
         this.bg.get(TransformComponent).z = 0;
 
-        this.player.pos = vec(Config.width / 2, Config.height * .9);
-        this.player.z = 1;
+        this.bounds.z = 1;
 
-        this.add(this.bounds);
+        this.player.pos = vec(Config.width / 2, Config.height * .9);
+        this.player.z = 2;
+
 
         this.add(this.bg);
+        this.add(this.bounds);
         this.add(this.player);
     }
 }
