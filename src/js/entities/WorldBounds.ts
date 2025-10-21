@@ -54,6 +54,7 @@ export class WorldBounds extends Actor {
 
     /**
      * Создаёт полупрозрачные прямоугольники для обозначения границ мира
+     * todo более явное обозначение, например размытие
      * @protected
      */
     protected createGraphics() {
