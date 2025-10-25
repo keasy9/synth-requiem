@@ -4,6 +4,7 @@ import {Batches} from '@/resources.ts';
 import {Player} from '@/entities/Player.ts';
 import {Config} from '@/config.ts';
 import {WorldBounds} from '@/entities/WorldBounds.ts';
+import {Timeline} from '@/level/Timeline.ts';
 
 class Level extends Scene {
     protected bg: ParallaxBackground;
@@ -19,17 +20,15 @@ class Level extends Scene {
     }
 
     public onInitialize(_engine: Engine) {
-        this.bg.get(TransformComponent).z = 0;
-
-        this.bounds.z = 1;
+        this.bg.get(TransformComponent).z = -1;
 
         this.player.pos = vec(Config.width / 2, Config.height * .9);
-        this.player.z = 2;
-
 
         this.add(this.bg);
         this.add(this.bounds);
         this.add(this.player);
+
+        new Timeline();
     }
 
     public onPreUpdate(_engine: Engine, _elapsed: number) {
