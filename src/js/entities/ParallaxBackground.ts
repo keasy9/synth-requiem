@@ -24,15 +24,16 @@ export class ParallaxBackground extends Entity<TransformComponent> {
             .map(sprite => {
                 const layer = new Entity([new GraphicsComponent(), new TransformComponent()]);
 
+                const xOffset = ((sprite.width * this.layerScale) - sprite.width) / 2;
+
                 layer.get(GraphicsComponent).use(new GraphicsGroup({
                     useAnchor: false,
                     members: [
-                        {graphic: sprite.clone(), offset: vec(0, -sprite.height)},
-                        {graphic: sprite, offset: vec(0, 0)},
+                        {graphic: sprite.clone(), offset: vec(-xOffset, -sprite.height)},
+                        {graphic: sprite, offset: vec(-xOffset, 0)},
                     ],
                 }));
                 layer.get(TransformComponent).scale = vec(this.layerScale, this.layerScale);
-                layer.get(TransformComponent).pos.x = -((sprite.width * this.layerScale) - sprite.width) / 2;
 
                 this.addChild(layer);
 
