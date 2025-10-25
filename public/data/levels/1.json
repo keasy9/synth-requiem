@@ -1,0 +1,12 @@
+{
+    "id": 1,
+    "timeline": [
+        {
+            "type": "wave",
+            "conf": {
+                "count": 3,
+                "type": 0
+            }
+        }
+    ]
+}

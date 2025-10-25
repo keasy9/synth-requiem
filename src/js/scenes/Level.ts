@@ -1,22 +1,40 @@
-import {type Engine, Scene, TransformComponent, vec} from 'excalibur';
+import {type Engine, Resource, Scene, TransformComponent, vec} from 'excalibur';
 import {ParallaxBackground} from '@/entities/ParallaxBackground.ts';
 import {Batches} from '@/resources.ts';
 import {Player} from '@/entities/Player.ts';
 import {Config} from '@/config.ts';
 import {WorldBounds} from '@/entities/WorldBounds.ts';
-import {Timeline} from '@/level/Timeline.ts';
+import {Timeline, type TimelineEventConf} from '@/level/Timeline.ts';
+import type {Default} from '@/loaders/Default.ts';
+
+type LevelConfig = {
+    id: string,
+    timeline: TimelineEventConf[],
+}
 
 class Level extends Scene {
     protected bg: ParallaxBackground;
     protected player: Player;
     protected bounds: WorldBounds;
 
-    public constructor() {
+    protected levelNumber: number;
+    protected levelData: Resource<LevelConfig>;
+    protected timeline: Timeline;
+
+    public constructor(levelNumber = 1) {
         super();
 
         this.bg = new ParallaxBackground();
         this.bounds = new WorldBounds();
         this.player = new Player();
+
+        this.levelNumber = levelNumber;
+        this.levelData = new Resource<LevelConfig>(`./data/levels/${levelNumber}.json`, 'json');
+        this.timeline = new Timeline();
+    }
+
+    public onPreLoad(loader: Default): void {
+        loader.addResource(this.levelData);
     }
 
     public onInitialize(_engine: Engine) {
@@ -28,12 +46,16 @@ class Level extends Scene {
         this.add(this.bounds);
         this.add(this.player);
 
-        new Timeline();
+        if (!this.levelData.data.timeline) throw new Error(`Не удалось загрузить уровень [${this.levelNumber}]!`);
+
+        this.timeline.buildPlan(this.levelData.data.timeline);
     }
 
-    public onPreUpdate(_engine: Engine, _elapsed: number) {
+    public onPreUpdate(engine: Engine, elapsed: number) {
         this.bg.speedupFromSpeed(-this.player.getSpeed().y)
             .setOffsetFromPosition(this.player.getPosition().x);
+
+        this.timeline.onPreUpdate(engine, elapsed);
     }
 }
 

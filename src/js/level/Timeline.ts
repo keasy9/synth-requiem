@@ -10,40 +10,61 @@ type TimelineEventWaveConf = {
     conf: EnemyWaveConf,
 }
 
-type TimelineEventConf = ({ delay: number } | { time: number }) & (TimelineEventWaveConf); // todo | OtherEventConf | OtherEventConf
+export type TimelineEventConf = ({ delay: number } | { time: number }) & (TimelineEventWaveConf); // todo | OtherEventConf | OtherEventConf
 
 type TimelineEvent = EnemyWave; // todo | OtherEventClass | OtherEventClass
 
 export class Timeline implements OnPreUpdate {
     protected plannedEvents: {time: number, event: TimelineEvent}[] = [];
     protected currentEvents: TimelineEvent[] = [];
+    protected time = 0;
 
     constructor() {}
 
     public buildPlan(conf: TimelineEventConf[]): this {
         let time = 0;
 
-        conf.forEach(eventConf => {
+        this.plannedEvents = conf.map(eventConf => {
             if ('delay' in eventConf) time += eventConf.delay;
             else time = eventConf.time;
 
             switch (eventConf.type) {
                 case TimelineEventType.Wave:
-                    this.plannedEvents.push({
+                    return {
                         time: time,
                         event: new EnemyWave(eventConf.conf),
-                    })
-                    break;
+                    };
             }
-        });
+        }).sort((a, b) => a.time - b.time);
 
         return this;
     }
 
-    public onPreUpdate(_engine: Engine, _elapsed: number): void {
-        // todo обновлять текущие события
-        // todo проверять текущие события на завершение
-        // todo проверять запланированные события на необходимость начала
-        // todo разрешать событиям прерывать обновление следующих событий
+    public onPreUpdate(engine: Engine, elapsed: number): void {
+        // 1) ищем событие, которое блокирует остальные (например, сюжетная вставка)
+        const blockingEvent = this.currentEvents.find(e => e.blockTimeline());
+        if (blockingEvent) {
+            blockingEvent.onPreUpdate(engine, elapsed);
+            return;
+        }
+
+        // 2) обновляем все события
+        this.currentEvents.forEach(e => e.onPreUpdate(engine, elapsed));
+
+        // 3) удаляем завершённые события
+        this.currentEvents = this.currentEvents.filter(event => !event.isEnded());
+
+        // 4) сохраняем прошедшее время
+        this.time += elapsed;
+
+        /**
+         * 5) начинаем след. событие
+         *
+         *  начинаем не больше одного события в кадре. Для событий, которые должны начинаться одновременно, разница
+         *  будет почти незаметной, а общая производительность улучшится
+         */
+        if (this.plannedEvents.length > 0 && this.plannedEvents[0]!.time <= this.time) {
+            this.currentEvents.push(this.plannedEvents.shift()!.event);
+        }
     }
 }

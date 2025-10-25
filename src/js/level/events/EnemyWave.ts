@@ -1,6 +1,7 @@
 import {Enemy, type EnemyTypeKey} from '@/entities/Enemy.ts';
-import {Pool} from 'excalibur';
+import {type Engine, type OnPreUpdate, Pool} from 'excalibur';
 import {GAME} from '@/main.ts';
+import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
 
 type EnemyConf = {
     type: EnemyTypeKey,
@@ -10,7 +11,7 @@ type EnemyListConf = ({ count: number } & EnemyConf) | { enemies: EnemyConf[] };
 
 export type EnemyWaveConf = EnemyListConf;
 
-export class EnemyWave {
+export class EnemyWave implements OnPreUpdate, TimelineEvent {
     protected static pool: Pool<Enemy>;
 
     protected enemyConfList: EnemyConf[] = [];
@@ -51,5 +52,18 @@ export class EnemyWave {
         });
 
         return this;
+    }
+
+    public onPreUpdate(_engine: Engine, _elapsed: number) {
+        // todo
+    }
+
+    public isEnded(): boolean {
+        // todo
+        return false;
+    }
+
+    public blockTimeline(): boolean {
+        return false;
     }
 }
