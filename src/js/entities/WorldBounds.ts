@@ -54,7 +54,6 @@ export class WorldBounds extends Actor {
 
     /**
      * Создаёт полупрозрачные прямоугольники для обозначения границ мира
-     * todo более явное обозначение, например размытие
      * @protected
      */
     protected createGraphics() {
@@ -68,16 +67,18 @@ export class WorldBounds extends Actor {
         if (offsetX !== 0) {
             bounds.push(
                 {
+                    // лево
                     graphic: new Rectangle({
-                        width: offsetX,
+                        width: offsetX + 10,
                         height: GAME.drawHeight,
                         color: boundsColor,
                     }),
-                    offset: vec(-offsetX, -offsetY),
+                    offset: vec(-offsetX - 10, -offsetY),
                 },
                 {
+                    // право
                     graphic: new Rectangle({
-                        width: offsetX,
+                        width: offsetX + 10,
                         height: GAME.drawHeight,
                         color: boundsColor,
                     }),
@@ -89,17 +90,19 @@ export class WorldBounds extends Actor {
         if (offsetY !== 0) {
             bounds.push(
                 {
+                    // верх
                     graphic: new Rectangle({
                         width: GAME.drawWidth,
-                        height: offsetY,
+                        height: offsetY + 10,
                         color: boundsColor,
                     }),
-                    offset: vec(-offsetX, -offsetY),
+                    offset: vec(-offsetX, -offsetY - 10),
                 },
                 {
+                    // низ
                     graphic: new Rectangle({
                         width: GAME.drawWidth,
-                        height: offsetY,
+                        height: offsetY + 10,
                         color: boundsColor,
                     }),
                     offset: vec(-offsetX, GAME.drawHeight - offsetY * 2),
