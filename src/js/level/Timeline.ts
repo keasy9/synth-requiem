@@ -1,5 +1,6 @@
-import {EnemyWave, type EnemyWaveConf} from '@/level/events/EnemyWave.ts';
 import type {Engine, OnPreUpdate} from 'excalibur';
+import {type EnemyWaveConf, EnemyWaveFactory} from '@/level/events/EnemeWaveFactory.ts';
+import type {EnemyWave} from '@/level/events/EnemyWave.ts';
 
 const TimelineEventType = {
     Wave: 'wave',
@@ -32,7 +33,7 @@ export class Timeline implements OnPreUpdate {
                 case TimelineEventType.Wave:
                     return {
                         time: time,
-                        event: new EnemyWave(eventConf.conf),
+                        event: EnemyWaveFactory.create(eventConf.conf),
                     };
             }
         }).sort((a, b) => a.time - b.time);

@@ -5,7 +5,8 @@
             "type": "wave",
             "conf": {
                 "count": 3,
-                "type": 0
+                "type": 0,
+                "spawnAngle": -1.5708
             }
         }
     ]

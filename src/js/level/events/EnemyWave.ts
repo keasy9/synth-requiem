@@ -1,19 +1,12 @@
 import {Enemy, type EnemyTypeKey} from '@/entities/Enemy.ts';
-import {type Engine, type OnPreUpdate, Pool} from 'excalibur';
+import {type Engine, type OnPreUpdate, Pool, type Vector} from 'excalibur';
 import {GAME} from '@/main.ts';
 import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
 
-type EnemyConf = {
+export type NormalizedEnemyConf = {
     type: EnemyTypeKey,
+    spawnPoint: Vector,
 }
-
-type EnemyListConf = ({ count: number } & EnemyConf) | { enemies: EnemyConf[] };
-
-type NormalizedEnemyConf = {
-    type: EnemyTypeKey,
-}
-
-export type EnemyWaveConf = EnemyListConf;
 
 export class EnemyWave implements OnPreUpdate, TimelineEvent {
     protected static pool: Pool<Enemy>;
@@ -21,7 +14,7 @@ export class EnemyWave implements OnPreUpdate, TimelineEvent {
     protected enemyConfList: NormalizedEnemyConf[] = [];
     protected enemies: Enemy[] = [];
 
-    constructor(conf: EnemyWaveConf) {
+    constructor(conf: NormalizedEnemyConf[]) {
         EnemyWave.pool ??= new Pool(
             () => new Enemy(),
             enemy => {
@@ -30,36 +23,14 @@ export class EnemyWave implements OnPreUpdate, TimelineEvent {
             },
         );
 
-        this.normalizeConf(conf);
-    }
-
-    protected normalizeConf(conf: EnemyWaveConf): void {
-        // todo отдельная фабрика, которая сама нормализует конфиг, всё вычисляет. А в волне только останется механизм обновления врагов и проверки, не мёртв ли враг
-        if ('enemies' in conf) {
-            // список врагов, каждый враг со своим поведением
-            this.enemyConfList = conf.enemies.map(enemyConf => {
-                return {
-                    type: enemyConf.type,
-                }
-            });
-
-        } else {
-            // группа врагов с одинаковым поведением
-            while (this.enemyConfList.length < conf.count) {
-                this.enemyConfList.push({
-                    type: conf.type,
-                });
-            }
-        }
-    }
-
-    protected makeEnemies(): void {
-
+        this.enemyConfList = conf;
     }
 
     public start(): this {
         this.enemyConfList.forEach(conf => {
-            const enemy = EnemyWave.pool.get().setType(conf.type);
+            const enemy = EnemyWave.pool.get();
+            enemy.setType(conf.type)
+            enemy.pos = conf.spawnPoint;
             this.enemies.push(enemy);
             GAME.add(enemy);
         });
