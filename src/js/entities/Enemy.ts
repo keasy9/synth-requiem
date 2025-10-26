@@ -55,18 +55,18 @@ export class Enemy extends Actor {
     }
 
     protected makeSpriteFromType(): void {
-        const sprite = Enemy.spriteSheet?.sprites[this.type];
-        if (!sprite) throw new Error(`Не найден спрайт для типа врага [${this.type}]`);
-
-        this.graphics.use(sprite);
-    }
-
-    public onInitialize(_engine: Engine): void {
         Enemy.spriteSheet ??= sprite(Resources.SpriteEnemies)
             .autoCols(8)
             .autoRows(8)
             .sheet();
 
+        const spriteFrame = Enemy.spriteSheet?.sprites[this.type];
+        if (!spriteFrame) throw new Error(`Не найден спрайт для типа врага [${this.type}]`);
+
+        this.graphics.use(spriteFrame);
+    }
+
+    public onInitialize(_engine: Engine): void {
         this.makeSpriteFromType();
     }
 

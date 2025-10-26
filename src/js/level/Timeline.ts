@@ -10,7 +10,7 @@ type TimelineEventWaveConf = {
     conf: EnemyWaveConf,
 }
 
-export type TimelineEventConf = ({ delay: number } | { time: number }) & (TimelineEventWaveConf); // todo | OtherEventConf | OtherEventConf
+export type TimelineEventConf = ({ delay?: number } | { time: number }) & (TimelineEventWaveConf); // todo | OtherEventConf | OtherEventConf
 
 type TimelineEvent = EnemyWave; // todo | OtherEventClass | OtherEventClass
 
@@ -25,8 +25,8 @@ export class Timeline implements OnPreUpdate {
         let time = 0;
 
         this.plannedEvents = conf.map(eventConf => {
-            if ('delay' in eventConf) time += eventConf.delay;
-            else time = eventConf.time;
+            if ('delay' in eventConf && eventConf.delay !== undefined) time += eventConf.delay;
+            else if ('time' in eventConf) time = eventConf.time;
 
             switch (eventConf.type) {
                 case TimelineEventType.Wave:
@@ -64,7 +64,7 @@ export class Timeline implements OnPreUpdate {
          *  будет почти незаметной, а общая производительность улучшится
          */
         if (this.plannedEvents.length > 0 && this.plannedEvents[0]!.time <= this.time) {
-            this.currentEvents.push(this.plannedEvents.shift()!.event);
+            this.currentEvents.push(this.plannedEvents.shift()!.event.start());
         }
     }
 }

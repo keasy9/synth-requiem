@@ -9,12 +9,16 @@ type EnemyConf = {
 
 type EnemyListConf = ({ count: number } & EnemyConf) | { enemies: EnemyConf[] };
 
+type NormalizedEnemyConf = {
+    type: EnemyTypeKey,
+}
+
 export type EnemyWaveConf = EnemyListConf;
 
 export class EnemyWave implements OnPreUpdate, TimelineEvent {
     protected static pool: Pool<Enemy>;
 
-    protected enemyConfList: EnemyConf[] = [];
+    protected enemyConfList: NormalizedEnemyConf[] = [];
     protected enemies: Enemy[] = [];
 
     constructor(conf: EnemyWaveConf) {
@@ -26,13 +30,18 @@ export class EnemyWave implements OnPreUpdate, TimelineEvent {
             },
         );
 
-        this.computeTypes(conf);
+        this.normalizeConf(conf);
     }
 
-    protected computeTypes(conf: EnemyWaveConf): void {
+    protected normalizeConf(conf: EnemyWaveConf): void {
+        // todo отдельная фабрика, которая сама нормализует конфиг, всё вычисляет. А в волне только останется механизм обновления врагов и проверки, не мёртв ли враг
         if ('enemies' in conf) {
             // список врагов, каждый враг со своим поведением
-            this.enemyConfList = conf.enemies;
+            this.enemyConfList = conf.enemies.map(enemyConf => {
+                return {
+                    type: enemyConf.type,
+                }
+            });
 
         } else {
             // группа врагов с одинаковым поведением
@@ -42,6 +51,10 @@ export class EnemyWave implements OnPreUpdate, TimelineEvent {
                 });
             }
         }
+    }
+
+    protected makeEnemies(): void {
+
     }
 
     public start(): this {
