@@ -62,39 +62,29 @@ export class EnemyWaveFactory {
         const dirX = Math.cos(angle);
         const dirY = Math.sin(angle);
 
-        // границы экрана с учетом отступов
-        const left = -offsetX;
-        const right = Config.width + offsetX;
-        const top = -offsetY;
-        const bottom = Config.height + offsetY;
-
         // вычисляем расстояние до каждой границы в заданном направлении
         let tX = Number.MAX_VALUE;
         let tY = Number.MAX_VALUE;
 
         if (dirX > 0) {
-            tX = (right - centerX) / dirX;
+            tX = (Config.width + offsetX - centerX) / dirX;
         } else if (dirX < 0) {
-            tX = (left - centerX) / dirX;
+            tX = (-offsetX - centerX) / dirX;
         }
 
         if (dirY > 0) {
-            tY = (bottom - centerY) / dirY;
+            tY = (Config.height + offsetY - centerY) / dirY;
         } else if (dirY < 0) {
-            tY = (top - centerY) / dirY;
+            tY = (-offsetY - centerY) / dirY;
         }
-
-        // берем минимальное расстояние до ближайшей границы
-        const t = Math.min(tX, tY);
 
         // добавляем запас чтобы точка гарантированно была за экраном
         const extra = 10;
-        const totalDistance = t + extra;
+
+        // берем минимальное расстояние до ближайшей границы
+        const t = Math.floor(Math.min(tX, tY)) + extra;
 
         // вычисляем конечную точку
-        return vec(
-            centerX + dirX * totalDistance,
-            centerY + dirY * totalDistance,
-        );
+        return vec(centerX + dirX * t, centerY + dirY * t);
     }
 }
