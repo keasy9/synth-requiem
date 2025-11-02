@@ -44,6 +44,46 @@ export const EnemyType = {
 
 export type EnemyTypeKey = typeof EnemyType[keyof typeof EnemyType];
 
+// todo crop sprites
+const EnemySize = {
+    [EnemyType.White]: {width: 5, height: 5},
+    [EnemyType.Fork]: {width: 7, height: 5},
+    [EnemyType.Trident]: {width: 5, height: 5},
+    [EnemyType.Ocean]: {width: 6, height: 4},
+    [EnemyType.Grass]: {width: 5, height: 4},
+    [EnemyType.Crab]: {width: 7, height: 5},
+    [EnemyType.Dark]: {width: 6, height: 4},
+    [EnemyType.Girl]: {width: 6, height: 4},
+    [EnemyType.Peak]: {width: 5, height: 5},
+    [EnemyType.Sun]: {width: 6, height: 5},
+    [EnemyType.Spoon]: {width: 6, height: 5},
+    [EnemyType.Tiny]: {width: 4, height: 5},
+    [EnemyType.Tree]: {width: 7, height: 6},
+    [EnemyType.Woman]: {width: 8, height: 6},
+    [EnemyType.Star]: {width: 6, height: 6},
+    [EnemyType.Rocket]: {width: 5, height: 6},
+    [EnemyType.Brown]: {width: 8, height: 5},
+    [EnemyType.Ball]: {width: 6, height: 5},
+    [EnemyType.Wedge]: {width: 6, height: 6},
+    [EnemyType.Foot]: {width: 6, height: 6},
+    [EnemyType.Handsome]: {width: 6, height: 6},
+    [EnemyType.Fish]: {width: 5, height: 6},
+    [EnemyType.Knuckle]: {width: 6, height: 5},
+    [EnemyType.Drop]: {width: 8, height: 6},
+    [EnemyType.Devil]: {width: 8, height: 8},
+    [EnemyType.Goat]: {width: 8, height: 8},
+    [EnemyType.Beetle]: {width: 8, height: 8},
+    [EnemyType.Grig]: {width: 8, height: 7},
+    [EnemyType.Puddle]: {width: 6, height: 6},
+    [EnemyType.Hugger]: {width: 8, height: 6},
+    [EnemyType.Sea]: {width: 8, height: 6},
+    [EnemyType.Head]: {width: 6, height: 8},
+    [EnemyType.Hasher]: {width: 6, height: 6},
+    [EnemyType.Grip]: {width: 6, height: 6},
+    [EnemyType.Butt]: {width: 6, height: 6},
+    [EnemyType.Glider]: {width: 8, height: 7},
+} as const;
+
 export class Enemy extends Actor {
 
     protected static spriteSheet?: SpriteSheet;
@@ -63,16 +103,25 @@ export class Enemy extends Actor {
         const spriteFrame = Enemy.spriteSheet?.sprites[this.type];
         if (!spriteFrame) throw new Error(`Не найден спрайт для типа врага [${this.type}]`);
 
+        spriteFrame.width = spriteFrame.sourceView.width = EnemySize[this.type].width;
+        spriteFrame.height = spriteFrame.sourceView.height = EnemySize[this.type].height;
+
         this.graphics.use(spriteFrame);
+    }
+
+    protected makeColliderFromType(): void {
+        this.collider.useBoxCollider(EnemySize[this.type].width, EnemySize[this.type].height);
     }
 
     public onInitialize(_engine: Engine): void {
         this.makeSpriteFromType();
+        this.makeColliderFromType();
     }
 
     public setType(type: EnemyTypeKey): this {
         this.type = type;
         this.makeSpriteFromType();
+        this.makeColliderFromType();
         return this;
     }
 }

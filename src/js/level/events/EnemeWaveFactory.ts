@@ -9,7 +9,9 @@ type EnemyConf = {
     spawnAngle: number, // угол в радианах, на котором от центра экрана спавнить врагов
 }
 
-type EnemyGroupConf = ({ count: number } & EnemyConf);
+type EnemyGroupConf =  EnemyConf & {
+    count: number,
+};
 
 type EnemyListConf = EnemyGroupConf | { enemies: EnemyConf[] };
 
@@ -79,7 +81,7 @@ export class EnemyWaveFactory {
         }
 
         // добавляем запас чтобы точка гарантированно была за экраном
-        const extra = 10;
+        const extra = -10; // todo
 
         // берем минимальное расстояние до ближайшей границы
         const t = Math.floor(Math.min(tX, tY)) + extra;
