@@ -12,6 +12,11 @@
                     "gap": {
                         "x": 0.9
                     }
+                },
+                "movement": {
+                    "type": "linear",
+                    "angle": 0,
+                    "speed": 1
                 }
             }
         }

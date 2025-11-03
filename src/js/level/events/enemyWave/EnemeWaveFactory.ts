@@ -4,10 +4,13 @@ import {SpawnPointComputer} from '@/level/events/enemyWave/SpawnPointComputer.ts
 import type {AnyFormationConf} from '@/level/events/enemyWave/types/Formation.ts';
 import {vec} from 'excalibur';
 import {EnemySize} from '@/entities/Enemy.ts';
+import {MovementFuncComputer} from '@/level/events/enemyWave/MovementFuncComputer.ts';
+import type {AnyMovementConf} from '@/level/events/enemyWave/types/Movement.ts';
 
 type EnemyConf = {
     type: EnemyTypeKey, // тип врага
     spawnAngle: number, // угол в радианах, на котором от центра экрана спавнить врагов
+    movement: AnyMovementConf,
 }
 
 type EnemyGroupConf =  EnemyConf & {
@@ -30,23 +33,27 @@ export class EnemyWaveFactory {
             return {
                 type: enemyConf.type,
                 spawnPoint: SpawnPointComputer.pointFromAngle(enemyConf.spawnAngle),
+                movement: MovementFuncComputer.getFunc(enemyConf.movement, enemyConf.spawnAngle),
             };
         });
     }
 
     protected static parseEnemyGroup(conf: EnemyGroupConf): NormalizedEnemyConf[] {
         const enemies = [];
+
         const spawnPoints = SpawnPointComputer.formationPoints(
             conf.spawnAngle,
             conf.formation,
             conf.count,
             EnemySize[conf.type],
         );
+        const movementFunc = MovementFuncComputer.getFunc(conf.movement, conf.spawnAngle);
 
         for (let i = 0; i < conf.count; i++) {
             enemies.push({
                 type: conf.type,
                 spawnPoint: spawnPoints[i] ?? vec(0, 0),
+                movement: movementFunc,
             });
         }
 

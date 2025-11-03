@@ -9,7 +9,7 @@ if (!canvasElem || !(canvasElem instanceof HTMLCanvasElement)) throw new Error('
 
 const scale = Math.ceil(
     Math.max(canvasElem.offsetWidth / width, canvasElem.offsetHeight / height)
-) * (window.devicePixelRatio);
+) * Math.max(2, window.devicePixelRatio); // минимум 2 для плавного движения
 
 export const Config = {
     width: width,
@@ -21,6 +21,7 @@ export const Config = {
     pixelRatio: scale,
     backgroundColor: Color.Black,
     canvasElement: canvasElem,
+    fixedUpdateFps: 30,
     scenes: {
         level,
     }

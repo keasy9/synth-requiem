@@ -2,14 +2,16 @@ import {Enemy, type EnemyTypeKey} from '@/entities/Enemy.ts';
 import {type Engine, type OnPreUpdate, RentalPool, type Vector} from 'excalibur';
 import {GAME} from '@/main.ts';
 import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
+import type {EnemyMovementFunc} from '@/level/events/enemyWave/MovementFuncComputer.ts';
 
 export type NormalizedEnemyConf = {
     type: EnemyTypeKey,
     spawnPoint: Vector,
+    movement: EnemyMovementFunc,
 }
 
 export class EnemyWave implements OnPreUpdate, TimelineEvent {
-    protected static pool: RentalPool<Enemy>; // todo RentalPool
+    protected static pool: RentalPool<Enemy>;
 
     protected enemyConfList: NormalizedEnemyConf[] = [];
     protected enemies: Enemy[] = [];
@@ -38,8 +40,8 @@ export class EnemyWave implements OnPreUpdate, TimelineEvent {
         return this;
     }
 
-    public onPreUpdate(_engine: Engine, _elapsed: number) {
-        // todo
+    public onPreUpdate(_engine: Engine, elapsed: number) {
+        this.enemies.forEach((enemy, i) => this.enemyConfList[i]?.movement(enemy, elapsed));
     }
 
     public isEnded(): boolean {
