@@ -1,5 +1,5 @@
 import {Enemy, type EnemyTypeKey} from '@/entities/Enemy.ts';
-import {type Engine, type OnPreUpdate, Pool, type Vector} from 'excalibur';
+import {type Engine, type OnPreUpdate, RentalPool, type Vector} from 'excalibur';
 import {GAME} from '@/main.ts';
 import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
 
@@ -9,13 +9,13 @@ export type NormalizedEnemyConf = {
 }
 
 export class EnemyWave implements OnPreUpdate, TimelineEvent {
-    protected static pool: Pool<Enemy>;
+    protected static pool: RentalPool<Enemy>; // todo RentalPool
 
     protected enemyConfList: NormalizedEnemyConf[] = [];
     protected enemies: Enemy[] = [];
 
     constructor(conf: NormalizedEnemyConf[]) {
-        EnemyWave.pool ??= new Pool(
+        EnemyWave.pool ??= new RentalPool(
             () => new Enemy(),
             enemy => {
                 enemy.vel.x = enemy.vel.y = enemy.rotation = enemy.pos.x = enemy.pos.y = 0;
@@ -28,7 +28,7 @@ export class EnemyWave implements OnPreUpdate, TimelineEvent {
 
     public start(): this {
         this.enemyConfList.forEach(conf => {
-            const enemy = EnemyWave.pool.get();
+            const enemy = EnemyWave.pool.rent();
             enemy.setType(conf.type)
             enemy.pos = conf.spawnPoint;
             this.enemies.push(enemy);

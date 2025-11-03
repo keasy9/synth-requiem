@@ -44,8 +44,7 @@ export const EnemyType = {
 
 export type EnemyTypeKey = typeof EnemyType[keyof typeof EnemyType];
 
-// todo crop sprites
-const EnemySize = {
+export const EnemySize = {
     [EnemyType.White]: {width: 5, height: 5},
     [EnemyType.Fork]: {width: 7, height: 5},
     [EnemyType.Trident]: {width: 5, height: 5},
