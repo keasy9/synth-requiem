@@ -1,18 +1,12 @@
-import {
-    Actor,
-    type Animation,
-    AnimationStrategy,
-    CollisionType,
-    type Engine,
-    GraphicsGroup,
-    type GraphicsGrouping,
-    vec, Vector,
-} from 'excalibur';
+import {Actor, type Animation, CollisionType, type Engine, RentalPool, vec, Vector} from 'excalibur';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import type {InputPlayer} from '@/helpers/input/InputPlayer.ts';
 import {inputPlayer} from '@/helpers/input/InputPlayer.ts';
 import {Actions} from '@/helpers/input/sources/InputSource.ts';
+import type {AnyBulletType, Bullet} from '@/entities/Bullet.ts';
+import {BulletType} from '@/entities/Bullet.ts';
+import {Exhaust, ExhaustType} from '@/entities/Exhaust.ts';
 
 export const PlayerType = {
     White: 1,
@@ -28,6 +22,7 @@ export class Player extends Actor {
     protected type: AnyPlayerType;
     protected sprite?: Animation;
     protected input: InputPlayer;
+    protected exhausts: Exhaust[] = [];
 
     protected maxSpeed = 50;
 
@@ -42,22 +37,55 @@ export class Player extends Actor {
         this.input = inputPlayer(0);
     }
 
-    protected makeExhaust(): GraphicsGrouping[] {
+    protected makeExhaustFromType(): void {
+        this.exhausts.forEach(e => e.kill());
+
         switch (this.type) {
             case PlayerType.White:
-                return [{
-                    useBounds: false,
-                    graphic: sprite(Resources.SpriteExhausts)
-                        .cols(8)
-                        .rows(3)
-                        .from(8)
-                        .to(11)
-                        .anim(AnimationStrategy.Loop, 80),
-                    offset: vec(3, 7),
-                }];
-                // todo выхлоп для других типов игроков
-            default:
-                return [];
+                this.exhausts = [new Exhaust(ExhaustType.Medium).moveTo(1, 5.5)];
+                break;
+
+            case PlayerType.Yellow:
+                this.exhausts = [
+                    new Exhaust(ExhaustType.Small).moveTo(-1, 6.5),
+                    new Exhaust(ExhaustType.Small).moveTo(4, 6.5).skipFrames(2),
+                ];
+                break;
+
+            case PlayerType.Green:
+                this.exhausts = [new Exhaust(ExhaustType.Medium).moveTo(1, 6.5)];
+                break;
+
+            case PlayerType.Purple:
+                this.exhausts = [new Exhaust(ExhaustType.Large).moveTo(0, 5.5)];
+                break;
+
+            case PlayerType.Red:
+                this.exhausts = [
+                    new Exhaust(ExhaustType.Small).moveTo(0, 6.5),
+                    new Exhaust(ExhaustType.Small).moveTo(3, 6.5).skipFrames(2),
+                ];
+                break;
+        }
+
+        this.exhausts.forEach(e => this.addChild(e));
+    }
+
+    protected moveExhaust(): void {
+        let state = 'default';
+        if (this.body.vel.x > 0) state = 'right';
+        else if (this.body.vel.x < 0) state = 'left';
+
+        switch (this.type) {
+            case PlayerType.Yellow:
+                this.exhausts[0]!.pos.x = state === 'right' ? 0 : -1;
+                this.exhausts[1]!.pos.x = state === 'left' ? 3 : 4;
+                break;
+
+            case PlayerType.Red:
+                this.exhausts[0]!.pos.x = state === 'left' ? 1 : 0;
+                this.exhausts[1]!.pos.x = state === 'right' ? 2 : 3;
+                break;
         }
     }
 
@@ -71,12 +99,9 @@ export class Player extends Actor {
         this.sprite.pause();
         this.sprite.goToFrame(1);
 
-        this.graphics.use(new GraphicsGroup({
-            members: [
-                this.sprite,
-                ...this.makeExhaust(),
-            ],
-        }));
+        this.graphics.use(this.sprite);
+
+        this.makeExhaustFromType();
     }
 
     public onPreUpdate(_engine: Engine, _elapsed: number) {
@@ -92,6 +117,7 @@ export class Player extends Actor {
         else this.sprite?.goToFrame(1);
 
         this.body.vel = velocity.normalize().scaleEqual(this.maxSpeed);
+        this.moveExhaust();
     }
 
     public getSpeed(): Vector {
