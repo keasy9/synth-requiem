@@ -47,7 +47,7 @@ class SpriteBuilder {
      * Автоматически рассчитать сколько строк кадров в спрайте.
      */
     public autoRows(width: number): this {
-        this._rows = undefined;
+        this._cols = undefined;
         this._width = width;
         return this;
     }
@@ -64,7 +64,7 @@ class SpriteBuilder {
      * Автоматически рассчитать сколько колонок кадров в спрайте.
      */
     public autoCols(height: number): this {
-        this._cols = undefined;
+        this._rows = undefined;
         this._height = height;
         return this;
     }

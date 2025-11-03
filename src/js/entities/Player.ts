@@ -1,10 +1,10 @@
-import {Actor, type Animation, CollisionType, type Engine, RentalPool, vec, Vector} from 'excalibur';
+import {Actor, type Animation, CollisionType, type Engine, RentalPool, Timer, vec, Vector} from 'excalibur';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import type {InputPlayer} from '@/helpers/input/InputPlayer.ts';
 import {inputPlayer} from '@/helpers/input/InputPlayer.ts';
 import {Actions} from '@/helpers/input/sources/InputSource.ts';
-import type {AnyBulletType, Bullet} from '@/entities/Bullet.ts';
+import {type AnyBulletType, Bullet} from '@/entities/Bullet.ts';
 import {BulletType} from '@/entities/Bullet.ts';
 import {Exhaust, ExhaustType} from '@/entities/Exhaust.ts';
 
@@ -19,14 +19,19 @@ export const PlayerType = {
 export type AnyPlayerType = typeof PlayerType[keyof typeof PlayerType];
 
 export class Player extends Actor {
+    protected static bullets: RentalPool<Bullet>;
+
     protected type: AnyPlayerType;
+    protected bulletType: AnyBulletType;
     protected sprite?: Animation;
     protected input: InputPlayer;
+    protected fireTimer: Timer;
     protected exhausts: Exhaust[] = [];
 
     protected maxSpeed = 50;
+    protected fireInterval = 250;
 
-    public constructor(type: AnyPlayerType = PlayerType.White) {
+    public constructor(type: AnyPlayerType = PlayerType.White, bulletType: AnyBulletType = BulletType.Bit) {
         super({
             collisionType: CollisionType.Active,
             width: 8,
@@ -34,7 +39,16 @@ export class Player extends Actor {
         });
 
         this.type = type;
+        this.bulletType = bulletType;
         this.input = inputPlayer(0);
+
+        this.fireTimer = new Timer({
+            repeats: true,
+            interval: this.fireInterval,
+            action: () => this.fireBullet(),
+        });
+
+        this.transform.z = 10;
     }
 
     protected makeExhaustFromType(): void {
@@ -102,6 +116,13 @@ export class Player extends Actor {
         this.graphics.use(this.sprite);
 
         this.makeExhaustFromType();
+
+        Player.bullets ??= new RentalPool(
+            () => new Bullet(this.bulletType),
+            (bullet) => bullet.setType(this.bulletType),
+        );
+
+        this.scene?.add(this.fireTimer);
     }
 
     public onPreUpdate(_engine: Engine, _elapsed: number) {
@@ -118,6 +139,12 @@ export class Player extends Actor {
 
         this.body.vel = velocity.normalize().scaleEqual(this.maxSpeed);
         this.moveExhaust();
+
+        if (this.input.started(Actions.Fire)) {
+            this.fireTimer.start()
+        } else if (this.input.ended(Actions.Fire)) {
+            this.fireTimer.stop();
+        }
     }
 
     public getSpeed(): Vector {
@@ -126,5 +153,15 @@ export class Player extends Actor {
 
     public getPosition(): Vector {
         return this.body.pos;
+    }
+
+    public fireBullet(): void {
+        const bullet = Player.bullets.rent(true);
+
+        this.scene?.add(bullet);
+
+        bullet.rotation = this.rotation;
+        bullet.pos = this.pos.clone();
+        bullet.body.vel = vec(0, -100).rotate(bullet.rotation);
     }
 }

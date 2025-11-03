@@ -3,7 +3,7 @@ import {EnemyWave, type NormalizedEnemyConf} from '@/level/events/enemyWave/Enem
 import {SpawnPointComputer} from '@/level/events/enemyWave/SpawnPointComputer.ts';
 import type {AnyFormationConf} from '@/level/events/enemyWave/types/Formation.ts';
 import {vec} from 'excalibur';
-import {EnemySize} from '@/entities/Enemy.ts';
+import {EnemySizeMap} from '@/entities/Enemy.ts';
 import {MovementFuncComputer} from '@/level/events/enemyWave/MovementFuncComputer.ts';
 import type {AnyMovementConf} from '@/level/events/enemyWave/types/Movement.ts';
 
@@ -45,7 +45,7 @@ export class EnemyWaveFactory {
             conf.spawnAngle,
             conf.formation,
             conf.count,
-            EnemySize[conf.type],
+            EnemySizeMap[conf.type],
         );
         const movementFunc = MovementFuncComputer.getFunc(conf.movement, conf.spawnAngle);
 

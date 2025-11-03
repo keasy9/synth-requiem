@@ -7,6 +7,7 @@ export const Resources = {
     SpritePlayers: new ImageSource('./assets/sprites/players.png'),
     SpriteExhausts: new ImageSource('./assets/sprites/exhaust.png'),
     SpriteEnemies: new ImageSource('./assets/sprites/enemies.png'),
+    SpriteBullets: new ImageSource('./assets/sprites/bullets.png'),
 } as const;
 
 // ресурсы которые нужны сразу после старта игры или на протяжении всей игры
@@ -21,6 +22,7 @@ levelBatch.addResources([
     Resources.SpritePlayers,
     Resources.SpriteExhausts,
     Resources.SpriteEnemies,
+    Resources.SpriteBullets,
 ]);
 
 export const Batches = {

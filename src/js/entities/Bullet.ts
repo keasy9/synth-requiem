@@ -77,4 +77,8 @@ export class Bullet extends Actor {
         this.makeColliderFromType();
         return this;
     }
+
+    public onPostUpdate(_engine: Engine, _elapsed: number) {
+        if (this.isOffScreen) this.kill();
+    }
 }

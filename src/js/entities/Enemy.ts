@@ -44,7 +44,7 @@ export const EnemyType = {
 
 export type AnyEnemyType = typeof EnemyType[keyof typeof EnemyType];
 
-export const EnemySize = {
+export const EnemySizeMap = {
     [EnemyType.White]: {width: 5, height: 5},
     [EnemyType.Fork]: {width: 7, height: 5},
     [EnemyType.Trident]: {width: 5, height: 5},
@@ -102,14 +102,14 @@ export class Enemy extends Actor {
         const spriteFrame = Enemy.spriteSheet?.sprites[this.type];
         if (!spriteFrame) throw new Error(`Не найден спрайт для типа врага [${this.type}]`);
 
-        spriteFrame.width = spriteFrame.sourceView.width = EnemySize[this.type].width;
-        spriteFrame.height = spriteFrame.sourceView.height = EnemySize[this.type].height;
+        spriteFrame.width = spriteFrame.sourceView.width = EnemySizeMap[this.type].width;
+        spriteFrame.height = spriteFrame.sourceView.height = EnemySizeMap[this.type].height;
 
         this.graphics.use(spriteFrame);
     }
 
     protected makeColliderFromType(): void {
-        this.collider.useBoxCollider(EnemySize[this.type].width, EnemySize[this.type].height);
+        this.collider.useBoxCollider(EnemySizeMap[this.type].width, EnemySizeMap[this.type].height);
     }
 
     public onInitialize(_engine: Engine): void {

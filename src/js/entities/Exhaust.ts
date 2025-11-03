@@ -1,4 +1,4 @@
-import {Actor, type Animation, AnimationStrategy, type Engine, type Vector} from 'excalibur';
+import {Actor, type Animation, AnimationStrategy, type Engine} from 'excalibur';
 import {Resources} from '@/resources.ts';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 
