@@ -99,7 +99,7 @@ export class SpawnPointComputer {
         const targetCenter = SpawnPointComputer.pointFromAngle(angle);
 
         // сначала в локальных координатах, при чём центр волны - центр правого края экрана
-        const points = range(0, enemyCount)
+        let points = range(0, enemyCount)
             .map(i => {
                 const row = Math.floor(i / colsCount);
                 const col = i % colsCount;
@@ -116,7 +116,7 @@ export class SpawnPointComputer {
             });
 
         // затем поворачиваем на угол смещения сетки
-        points.forEach(p => p.rotate(formationConf.rotation ?? 0));
+        points = points.map(p => p.rotate(formationConf.rotation ?? 0));
         // после поворота волна могла "вылезти" на экран, если центр нижнего ряда перестал быть границей экрана
         const minX = Math.ceil(Math.min(...points.slice(0, colsCount).map(p => p.x)));
 
