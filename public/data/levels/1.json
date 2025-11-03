@@ -4,9 +4,15 @@
         {
             "type": "wave",
             "conf": {
-                "count": 3,
+                "count": 20,
                 "type": 0,
-                "spawnAngle": -1.5708
+                "spawnAngle": -1.5708,
+                "formation": {
+                    "type": "grid",
+                    "gap": {
+                        "x": 0.9
+                    }
+                }
             }
         }
     ]

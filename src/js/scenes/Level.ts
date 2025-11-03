@@ -39,6 +39,7 @@ class Level extends Scene {
 
     public onInitialize(_engine: Engine) {
         this.bg.get(TransformComponent).z = -1;
+        this.bounds.get(TransformComponent).z = 100;
 
         this.player.pos = vec(Config.width / 2, Config.height * .9);
 

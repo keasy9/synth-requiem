@@ -1,6 +1,6 @@
 import type {Engine, OnPreUpdate} from 'excalibur';
-import {type EnemyWaveConf, EnemyWaveFactory} from '@/level/events/EnemeWaveFactory.ts';
-import type {EnemyWave} from '@/level/events/EnemyWave.ts';
+import {type EnemyWaveConf, EnemyWaveFactory} from '@/level/events/enemyWave/EnemeWaveFactory.ts';
+import type {EnemyWave} from '@/level/events/enemyWave/EnemyWave.ts';
 
 const TimelineEventType = {
     Wave: 'wave',
