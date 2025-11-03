@@ -22,16 +22,16 @@ export const PlayerType = {
     Red: 5,
 } as const;
 
-export type PlayerTypeKey = typeof PlayerType[keyof typeof PlayerType];
+export type AnyPlayerType = typeof PlayerType[keyof typeof PlayerType];
 
 export class Player extends Actor {
-    protected type: PlayerTypeKey;
+    protected type: AnyPlayerType;
     protected sprite?: Animation;
     protected input: InputPlayer;
 
     protected maxSpeed = 50;
 
-    public constructor(type: PlayerTypeKey = PlayerType.White) {
+    public constructor(type: AnyPlayerType = PlayerType.White) {
         super({
             collisionType: CollisionType.Active,
             width: 8,

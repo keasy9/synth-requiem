@@ -1,11 +1,11 @@
-import {Enemy, type EnemyTypeKey} from '@/entities/Enemy.ts';
+import {Enemy, type AnyEnemyType} from '@/entities/Enemy.ts';
 import {type Engine, type OnPreUpdate, RentalPool, type Vector} from 'excalibur';
 import {GAME} from '@/main.ts';
 import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
 import type {EnemyMovementFunc} from '@/level/events/enemyWave/MovementFuncComputer.ts';
 
 export type NormalizedEnemyConf = {
-    type: EnemyTypeKey,
+    type: AnyEnemyType,
     spawnPoint: Vector,
     movement: EnemyMovementFunc,
 }

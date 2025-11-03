@@ -1,4 +1,4 @@
-import type {EnemyTypeKey} from '@/entities/Enemy.ts';
+import type {AnyEnemyType} from '@/entities/Enemy.ts';
 import {EnemyWave, type NormalizedEnemyConf} from '@/level/events/enemyWave/EnemyWave.ts';
 import {SpawnPointComputer} from '@/level/events/enemyWave/SpawnPointComputer.ts';
 import type {AnyFormationConf} from '@/level/events/enemyWave/types/Formation.ts';
@@ -8,7 +8,7 @@ import {MovementFuncComputer} from '@/level/events/enemyWave/MovementFuncCompute
 import type {AnyMovementConf} from '@/level/events/enemyWave/types/Movement.ts';
 
 type EnemyConf = {
-    type: EnemyTypeKey, // тип врага
+    type: AnyEnemyType, // тип врага
     spawnAngle: number, // угол в радианах, на котором от центра экрана спавнить врагов
     movement: AnyMovementConf,
 }

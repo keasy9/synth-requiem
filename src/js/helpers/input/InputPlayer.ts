@@ -1,4 +1,4 @@
-import type {ActionKey, InputSource, InputSourceTypeKey} from '@/helpers/input/sources/InputSource.ts';
+import type {ActionKey, InputSource, AnyInputSourceType} from '@/helpers/input/sources/InputSource.ts';
 import type {KeyboardBindings} from '@/helpers/input/sources/Keyboard.ts';
 import {InputSourceType} from '@/helpers/input/sources/InputSource.ts';
 import {Keyboard} from '@/helpers/input/sources/Keyboard.ts';
@@ -6,7 +6,7 @@ import type {GamepadBindings} from '@/helpers/input/sources/Gamepad.ts';
 import {Gamepad} from '@/helpers/input/sources/Gamepad.ts';
 
 export class InputPlayer {
-    protected sources: Record<InputSourceTypeKey, InputSource> = {} as Record<InputSourceTypeKey, InputSource>;
+    protected sources: Record<AnyInputSourceType, InputSource> = {} as Record<AnyInputSourceType, InputSource>;
 
     public bindKeyboard(bindings?: KeyboardBindings): this {
         this.sources[InputSourceType.Keyboard] = new Keyboard(bindings);

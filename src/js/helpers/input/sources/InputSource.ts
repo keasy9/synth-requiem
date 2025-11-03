@@ -14,10 +14,10 @@ export const InputSourceType = {
     // todo pointer
 } as const;
 
-export type InputSourceTypeKey = typeof InputSourceType[keyof typeof InputSourceType];
+export type AnyInputSourceType = typeof InputSourceType[keyof typeof InputSourceType];
 
 export interface InputSource {
-    readonly type: InputSourceTypeKey;
+    readonly type: AnyInputSourceType;
     started(action: ActionKey): boolean;
     is(action: ActionKey): boolean;
     ended(action: ActionKey): boolean;

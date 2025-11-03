@@ -42,7 +42,7 @@ export const EnemyType = {
     Glider: 36,
 } as const;
 
-export type EnemyTypeKey = typeof EnemyType[keyof typeof EnemyType];
+export type AnyEnemyType = typeof EnemyType[keyof typeof EnemyType];
 
 export const EnemySize = {
     [EnemyType.White]: {width: 5, height: 5},
@@ -86,9 +86,9 @@ export const EnemySize = {
 export class Enemy extends Actor {
 
     protected static spriteSheet?: SpriteSheet;
-    protected type: EnemyTypeKey;
+    protected type: AnyEnemyType;
 
-    constructor(type: EnemyTypeKey = EnemyType.White) {
+    constructor(type: AnyEnemyType = EnemyType.White) {
         super();
         this.type = type;
     }
@@ -117,7 +117,7 @@ export class Enemy extends Actor {
         this.makeColliderFromType();
     }
 
-    public setType(type: EnemyTypeKey): this {
+    public setType(type: AnyEnemyType): this {
         this.type = type;
         this.makeSpriteFromType();
         this.makeColliderFromType();
