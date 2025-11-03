@@ -8,7 +8,7 @@ export class MovementFuncComputer {
     public static getFunc(conf: AnyMovementConf, spawnAngle: number): EnemyMovementFunc {
         switch (conf.type) {
             case MovementType.Linear:
-                conf.speed *= .025; // подобранный коэфициент, чтобы скорость 1 была нормальной
+                conf.speed *= .02; // подобранный коэфициент, чтобы скорость 1 была нормальной
                 return MovementFuncComputer.getLinearFunc(conf, spawnAngle);
         }
     }
