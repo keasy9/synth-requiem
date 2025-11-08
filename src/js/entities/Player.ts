@@ -1,4 +1,14 @@
-import {Actor, type Animation, CollisionType, type Engine, RentalPool, Timer, vec, Vector} from 'excalibur';
+import {
+    Actor,
+    type Animation,
+    CollisionType,
+    type Engine,
+    GraphicsComponent,
+    RentalPool,
+    Timer,
+    vec,
+    Vector,
+} from 'excalibur';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import type {InputPlayer} from '@/helpers/input/InputPlayer.ts';
@@ -8,13 +18,14 @@ import {type AnyBulletType, Bullet} from '@/entities/Bullet.ts';
 import {BulletType} from '@/entities/Bullet.ts';
 import {Exhaust, ExhaustType} from '@/entities/Exhaust.ts';
 import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
+import {Explosion, ExplosionType} from '@/entities/Explosion.ts';
 
 export const PlayerType = {
-    White: 1,
-    Yellow: 2,
-    Green: 3,
-    Purple: 4,
-    Red: 5,
+    White: 0,
+    Yellow: 1,
+    Green: 2,
+    Purple: 3,
+    Red: 4,
 } as const;
 
 export type AnyPlayerType = typeof PlayerType[keyof typeof PlayerType];

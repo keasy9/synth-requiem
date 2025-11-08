@@ -219,7 +219,7 @@ class SpriteBuilder {
      */
     protected computeIndexesIfNeeded(): void {
         if (this._row) {
-            this._from = this._cols! * (this._row - 1);
+            this._from = this._cols! * (this._row);
             this._to = this._from + this._cols! - 1;
         }
 

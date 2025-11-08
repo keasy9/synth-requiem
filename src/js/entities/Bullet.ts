@@ -3,6 +3,7 @@ import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import type {DamageProvider} from '@/entities/interfaces/DamageProvider.ts';
 import {collide} from '@/helpers/physics/Collider.ts';
+import type {DamageTaker} from '@/entities/interfaces/DamageTaker.ts';
 
 export const BulletType = {
     Wave: 0,
@@ -40,7 +41,7 @@ const BulletSizeMap = {
     [BulletType.Ring]: {width: 3, height: 6},
 } as const;
 
-export class Bullet extends Actor implements DamageProvider {
+export class Bullet extends Actor implements DamageProvider, DamageTaker {
 
     protected static spriteSheet?: SpriteSheet;
 
@@ -94,5 +95,9 @@ export class Bullet extends Actor implements DamageProvider {
 
     public get damage(): number {
         return this._damage;
+    }
+
+    public takeDamage(_damage: number) {
+        this.kill();
     }
 }

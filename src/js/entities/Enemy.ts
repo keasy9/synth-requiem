@@ -4,6 +4,8 @@ import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import type {DamageTaker} from '@/entities/interfaces/DamageTaker.ts';
 import {collide} from '@/helpers/physics/Collider.ts';
 import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
+import {Explosion, ExplosionType} from '@/entities/Explosion.ts';
+import type {DamageProvider} from '@/entities/interfaces/DamageProvider.ts';
 
 // значение - кадр в спрайте
 export const EnemyType = {
@@ -86,13 +88,14 @@ export const EnemySizeMap = {
     [EnemyType.Glider]: {width: 8, height: 7},
 } as const;
 
-export class Enemy extends Actor implements DamageTaker {
+export class Enemy extends Actor implements DamageTaker, DamageProvider {
 
     protected static spriteSheet?: SpriteSheet;
     protected static baseHealth: number = 2;
 
     protected type: AnyEnemyType;
     protected health: number = 10;
+    protected _damage: number = 10;
 
     constructor(type: AnyEnemyType = EnemyType.White) {
         super({ collisionGroup: CollisionGroups.Enemy });
@@ -142,8 +145,12 @@ export class Enemy extends Actor implements DamageTaker {
         if (this.health <= 0) this.explode()
     }
 
+    public get damage(): number {
+        return this._damage;
+    }
+
     protected explode() {
         this.kill();
-        console.log('todo');
+        Explosion.explode(ExplosionType.Orange, this.pos);
     }
 }
