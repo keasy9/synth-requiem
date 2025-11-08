@@ -19,6 +19,112 @@
                     "speed": 1
                 }
             }
+        },
+        {
+            "type": "wave",
+            "delay": 1500,
+            "conf": {
+                "count": 5,
+                "type": 1,
+                "spawnAngle": -1.5708,
+                "formation": {
+                    "type": "grid"
+                },
+                "movement": {
+                    "type": "linear",
+                    "angle": 0,
+                    "speed": 1
+                }
+            }
+        },
+        {
+            "type": "wave",
+            "delay": 600,
+            "conf": {
+                "count": 6,
+                "type": 1,
+                "spawnAngle": -1.5708,
+                "formation": {
+                    "type": "grid"
+                },
+                "movement": {
+                    "type": "linear",
+                    "angle": 0,
+                    "speed": 1
+                }
+            }
+        },
+        {
+            "type": "wave",
+            "delay": 600,
+            "conf": {
+                "count": 7,
+                "type": 1,
+                "spawnAngle": -1.5708,
+                "formation": {
+                    "type": "grid"
+                },
+                "movement": {
+                    "type": "linear",
+                    "angle": 0,
+                    "speed": 1
+                }
+            }
+        },
+        {
+            "type": "wave",
+            "delay": 600,
+            "conf": {
+                "count": 8,
+                "type": 1,
+                "spawnAngle": -1.5708,
+                "formation": {
+                    "type": "grid"
+                },
+                "movement": {
+                    "type": "linear",
+                    "angle": 0,
+                    "speed": 1
+                }
+            }
+        },
+        {
+            "type": "wave",
+            "delay": 2000,
+            "conf": {
+                "count": 3,
+                "type": 2,
+                "spawnAngle": -2.0708,
+                "formation": {
+                    "type": "grid",
+                    "gap": {"x": 3},
+                    "rotation": 1
+                },
+                "movement": {
+                    "type": "linear",
+                    "angle": 0,
+                    "speed": 1.3
+                }
+            }
+        },
+        {
+            "type": "wave",
+            "delay": 200,
+            "conf": {
+                "count": 3,
+                "type": 2,
+                "spawnAngle": -1.0708,
+                "formation": {
+                    "type": "grid",
+                    "gap": {"x": 3},
+                    "rotation": -1
+                },
+                "movement": {
+                    "type": "linear",
+                    "angle": 0,
+                    "speed": 1.3
+                }
+            }
         }
     ]
 }
