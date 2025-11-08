@@ -1,4 +1,4 @@
-import {Actor, type Engine, type SpriteSheet} from 'excalibur';
+import {Actor, Color, type Engine, type SpriteSheet, Timer} from 'excalibur';
 import {Resources} from '@/resources.ts';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import type {DamageTaker} from '@/entities/interfaces/DamageTaker.ts';
@@ -6,6 +6,7 @@ import {collide} from '@/helpers/physics/Collider.ts';
 import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
 import {Explosion, ExplosionType} from '@/entities/Explosion.ts';
 import type {DamageProvider} from '@/entities/interfaces/DamageProvider.ts';
+import {GAME} from '@/main.ts';
 
 // значение - кадр в спрайте
 export const EnemyType = {
@@ -109,7 +110,7 @@ export class Enemy extends Actor implements DamageTaker, DamageProvider {
             .autoRows(8)
             .sheet();
 
-        const spriteFrame = Enemy.spriteSheet?.sprites[this.type];
+        const spriteFrame = Enemy.spriteSheet?.sprites[this.type]?.clone();
         if (!spriteFrame) throw new Error(`Не найден спрайт для типа врага [${this.type}]`);
 
         spriteFrame.width = spriteFrame.sourceView.width = EnemySizeMap[this.type].width;
@@ -141,7 +142,19 @@ export class Enemy extends Actor implements DamageTaker, DamageProvider {
     }
 
     public takeDamage(damage: number) {
+        // todo выводить цифру сколько урона нанесено
         this.health -= damage;
+
+        const sprite = this.graphics.current;
+
+        if (sprite) {
+            sprite.tint = Color.Orange;
+            GAME.add(new Timer({
+                interval: 100,
+                action: () => delete sprite.tint,
+            }).start());
+        }
+
         if (this.health <= 0) this.explode()
     }
 

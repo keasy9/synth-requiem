@@ -1,14 +1,4 @@
-import {
-    Actor,
-    type Animation,
-    CollisionType,
-    type Engine,
-    GraphicsComponent,
-    RentalPool,
-    Timer,
-    vec,
-    Vector,
-} from 'excalibur';
+import {Actor, type Animation, CollisionType, type Engine, RentalPool, Timer, vec, Vector} from 'excalibur';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import type {InputPlayer} from '@/helpers/input/InputPlayer.ts';
@@ -18,7 +8,7 @@ import {type AnyBulletType, Bullet} from '@/entities/Bullet.ts';
 import {BulletType} from '@/entities/Bullet.ts';
 import {Exhaust, ExhaustType} from '@/entities/Exhaust.ts';
 import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
-import {Explosion, ExplosionType} from '@/entities/Explosion.ts';
+import {random} from '@/utils/math.ts';
 
 export const PlayerType = {
     White: 0,
@@ -174,7 +164,7 @@ export class Player extends Actor {
 
         this.scene?.add(bullet);
 
-        bullet.damage = this.bulletDamage;
+        bullet.damage = this.bulletDamage + random(-2, +2);
         bullet.rotation = this.rotation;
         bullet.pos = this.pos.clone();
         bullet.body.vel = vec(0, -100).rotate(bullet.rotation);

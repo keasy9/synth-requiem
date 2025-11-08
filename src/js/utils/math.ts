@@ -14,3 +14,7 @@ export function lerpInterval(
     const result = toLow + (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow);
     return precision === false ? result : floor(result, precision);
 }
+
+export function random(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
