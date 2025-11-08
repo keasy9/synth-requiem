@@ -8,6 +8,7 @@ export type NormalizedEnemyConf = {
     type: AnyEnemyType,
     spawnPoint: Vector,
     movement: EnemyMovementFunc,
+    health: number, // множитель
 }
 
 export class EnemyWave implements OnPreUpdate, TimelineEvent {
@@ -31,7 +32,8 @@ export class EnemyWave implements OnPreUpdate, TimelineEvent {
     public start(): this {
         this.enemyConfList.forEach(conf => {
             const enemy = EnemyWave.pool.rent();
-            enemy.setType(conf.type)
+            enemy.setType(conf.type);
+            enemy.setHealth(conf.health);
             enemy.pos = conf.spawnPoint;
             this.enemies.push(enemy);
             GAME.add(enemy);

@@ -11,6 +11,7 @@ type EnemyConf = {
     type: AnyEnemyType, // тип врага
     spawnAngle: number, // угол в радианах, на котором от центра экрана спавнить врагов
     movement: AnyMovementConf,
+    health?: number, // множитель
 }
 
 type EnemyGroupConf =  EnemyConf & {
@@ -34,6 +35,7 @@ export class EnemyWaveFactory {
                 type: enemyConf.type,
                 spawnPoint: SpawnPointComputer.pointFromAngle(enemyConf.spawnAngle),
                 movement: MovementFuncComputer.getFunc(enemyConf.movement, enemyConf.spawnAngle),
+                health: enemyConf.health ?? 1,
             };
         });
     }
@@ -54,6 +56,7 @@ export class EnemyWaveFactory {
                 type: conf.type,
                 spawnPoint: spawnPoints[i] ?? vec(0, 0),
                 movement: movementFunc,
+                health: conf.health ?? 1,
             });
         }
 

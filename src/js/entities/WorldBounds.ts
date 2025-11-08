@@ -1,16 +1,7 @@
-import {
-    Actor,
-    CollisionType,
-    Color,
-    CompositeCollider,
-    EdgeCollider,
-    type Engine,
-    GraphicsGroup, type GraphicsGrouping,
-    Rectangle,
-    vec,
-} from 'excalibur';
+import {Actor, CollisionType, Color, CompositeCollider, EdgeCollider, type Engine, GraphicsGroup, type GraphicsGrouping, Rectangle, vec} from 'excalibur';
 import {Config} from '@/config.ts';
 import {GAME} from '@/main.ts';
+import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
 
 export class WorldBounds extends Actor {
     public constructor() {
@@ -20,6 +11,7 @@ export class WorldBounds extends Actor {
             width: Config.width,
             height: Config.height,
             collisionType: CollisionType.Fixed,
+            collisionGroup: CollisionGroups.World,
         });
     }
 

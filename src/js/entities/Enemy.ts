@@ -1,6 +1,9 @@
 import {Actor, type Engine, type SpriteSheet} from 'excalibur';
 import {Resources} from '@/resources.ts';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
+import type {DamageTaker} from '@/entities/interfaces/DamageTaker.ts';
+import {collide} from '@/helpers/physics/Collider.ts';
+import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
 
 // значение - кадр в спрайте
 export const EnemyType = {
@@ -83,14 +86,18 @@ export const EnemySizeMap = {
     [EnemyType.Glider]: {width: 8, height: 7},
 } as const;
 
-export class Enemy extends Actor {
+export class Enemy extends Actor implements DamageTaker {
 
     protected static spriteSheet?: SpriteSheet;
+    protected static baseHealth: number = 2;
+
     protected type: AnyEnemyType;
+    protected health: number = 10;
 
     constructor(type: AnyEnemyType = EnemyType.White) {
-        super();
+        super({ collisionGroup: CollisionGroups.Enemy });
         this.type = type;
+        this.setHealth();
     }
 
     protected makeSpriteFromType(): void {
@@ -110,6 +117,7 @@ export class Enemy extends Actor {
 
     protected makeColliderFromType(): void {
         this.collider.useBoxCollider(EnemySizeMap[this.type].width, EnemySizeMap[this.type].height);
+        collide(this);
     }
 
     public onInitialize(_engine: Engine): void {
@@ -121,6 +129,21 @@ export class Enemy extends Actor {
         this.type = type;
         this.makeSpriteFromType();
         this.makeColliderFromType();
+        this.setHealth();
         return this;
+    }
+
+    public setHealth(multiplier: number = 1) {
+        this.health = (this.type + 1) * Enemy.baseHealth * multiplier;
+    }
+
+    public takeDamage(damage: number) {
+        this.health -= damage;
+        if (this.health <= 0) this.explode()
+    }
+
+    protected explode() {
+        this.kill();
+        console.log('todo');
     }
 }

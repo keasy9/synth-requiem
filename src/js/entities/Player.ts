@@ -7,6 +7,7 @@ import {Actions} from '@/helpers/input/sources/InputSource.ts';
 import {type AnyBulletType, Bullet} from '@/entities/Bullet.ts';
 import {BulletType} from '@/entities/Bullet.ts';
 import {Exhaust, ExhaustType} from '@/entities/Exhaust.ts';
+import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
 
 export const PlayerType = {
     White: 1,
@@ -30,12 +31,14 @@ export class Player extends Actor {
 
     protected maxSpeed = 50;
     protected fireInterval = 250;
+    protected bulletDamage = 10;
 
     public constructor(type: AnyPlayerType = PlayerType.White, bulletType: AnyBulletType = BulletType.Bit) {
         super({
-            collisionType: CollisionType.Active,
             width: 8,
             height: 8,
+            collisionType: CollisionType.Active,
+            collisionGroup: CollisionGroups.Player
         });
 
         this.type = type;
@@ -118,7 +121,7 @@ export class Player extends Actor {
         this.makeExhaustFromType();
 
         Player.bullets ??= new RentalPool(
-            () => new Bullet(this.bulletType),
+            () => new Bullet(this.bulletType, CollisionGroups.PlayerBullet),
             (bullet) => bullet.setType(this.bulletType),
         );
 
@@ -160,6 +163,7 @@ export class Player extends Actor {
 
         this.scene?.add(bullet);
 
+        bullet.damage = this.bulletDamage;
         bullet.rotation = this.rotation;
         bullet.pos = this.pos.clone();
         bullet.body.vel = vec(0, -100).rotate(bullet.rotation);

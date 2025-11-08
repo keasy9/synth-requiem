@@ -1,6 +1,8 @@
-import {Actor, Engine, SpriteSheet} from 'excalibur';
+import {Actor, type CollisionGroup, Engine, SpriteSheet} from 'excalibur';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
+import type {DamageProvider} from '@/entities/interfaces/DamageProvider.ts';
+import {collide} from '@/helpers/physics/Collider.ts';
 
 export const BulletType = {
     Wave: 0,
@@ -38,13 +40,15 @@ const BulletSizeMap = {
     [BulletType.Ring]: {width: 3, height: 6},
 } as const;
 
-export class Bullet extends Actor {
+export class Bullet extends Actor implements DamageProvider {
 
     protected static spriteSheet?: SpriteSheet;
-    protected type: AnyBulletType;
 
-    constructor(type: AnyBulletType = BulletType.Bit) {
-        super();
+    protected type: AnyBulletType;
+    protected _damage: number = 1;
+
+    constructor(type: AnyBulletType = BulletType.Bit, collisionGroup: CollisionGroup) {
+        super({ collisionGroup });
         this.type = type;
     }
 
@@ -63,7 +67,9 @@ export class Bullet extends Actor {
     }
 
     protected makeColliderFromType(): void {
+        // todo проверить корректность коллайдера когда пуля повёрнута
         this.collider.useBoxCollider(BulletSizeMap[this.type].width, BulletSizeMap[this.type].height);
+        collide(this);
     }
 
     public onInitialize(_engine: Engine): void {
@@ -80,5 +86,13 @@ export class Bullet extends Actor {
 
     public onPostUpdate(_engine: Engine, _elapsed: number) {
         if (this.isOffScreen) this.kill();
+    }
+
+    public set damage(damage: number) {
+        this._damage = damage;
+    }
+
+    public get damage(): number {
+        return this._damage;
     }
 }
