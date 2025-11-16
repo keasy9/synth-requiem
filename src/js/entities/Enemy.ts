@@ -112,7 +112,7 @@ export class Enemy extends Actor implements DamageTaker, DamageProvider {
             .sheet();
 
         const spriteFrame = Enemy.spriteSheet?.sprites[this.type]?.clone();
-        if (!spriteFrame) throw new Error(`Не найден спрайт для типа врага [${this.type}]`);
+        if (!spriteFrame) throw new Error(`Не найден спрайт для типа врага [${this.type}]!`);
 
         spriteFrame.width = spriteFrame.sourceView.width = EnemySizeMap[this.type].width;
         spriteFrame.height = spriteFrame.sourceView.height = EnemySizeMap[this.type].height;
