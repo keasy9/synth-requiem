@@ -1,6 +1,7 @@
 import {ImageSource} from 'excalibur';
 import {Intro} from '@/loaders/Intro.ts';
 import {Default} from '@/loaders/Default.ts';
+import {BitmapFontSource} from '@/loadables/BitmapFontSource.ts';
 
 export const Resources = {
     SpriteBackground: new ImageSource('./assets/sprites/space.png'),
@@ -9,6 +10,7 @@ export const Resources = {
     SpriteEnemies: new ImageSource('./assets/sprites/enemies.png'),
     SpriteBullets: new ImageSource('./assets/sprites/bullets.png'),
     SpriteExplosions: new ImageSource('./assets/sprites/explosions.png'),
+    TinyNumbersFont: new BitmapFontSource('./assets/sprites/fonts/tinynumbers.fnt'),
 } as const;
 
 // ресурсы которые нужны сразу после старта игры или на протяжении всей игры
@@ -25,6 +27,7 @@ levelBatch.addResources([
     Resources.SpriteEnemies,
     Resources.SpriteBullets,
     Resources.SpriteExplosions,
+    Resources.TinyNumbersFont,
 ]);
 
 export const Batches = {

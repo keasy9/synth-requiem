@@ -11,6 +11,7 @@ export type NormalizedEnemyConf = {
     health: number, // множитель
 }
 
+// todo уничтожать врагов, которые вышли за экран
 export class EnemyWave implements OnPreUpdate, TimelineEvent {
     protected static pool: RentalPool<Enemy>;
 

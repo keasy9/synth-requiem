@@ -1,4 +1,13 @@
-import {Animation, AnimationStrategy, type ImageSource, range, type SourceView, Sprite, SpriteSheet} from 'excalibur';
+import {
+    Animation,
+    AnimationStrategy,
+    type ImageSource,
+    range,
+    type SourceView,
+    Sprite,
+    SpriteFont,
+    SpriteSheet,
+} from 'excalibur';
 
 class SpriteBuilder {
     protected _image?: ImageSource;
@@ -352,11 +361,21 @@ class SpriteBuilder {
         this._indexes = [];
         return this.many();
     }
+
+    /**
+     * Создать bitmap-шрифт из спрайта.
+     */
+    public font(alphabet: string): SpriteFont {
+        return new SpriteFont({
+            alphabet: alphabet,
+            spriteSheet: this.sheet(),
+        });
+    }
 }
 
 /**
  * Создать спрайт из картинки. Автоматически умеет рассчитывать размер кадра когда передано их кол-во и наоборот.
- * Режет кадры слева направо сверху вниз
+ * Режет кадры слева направо сверху вниз. Умеет создавать спрайтшит, массив спрайтов, анимацию, bitmap-шрифт.
  */
 export function sprite(image: ImageSource) {
     return new SpriteBuilder().image(image);

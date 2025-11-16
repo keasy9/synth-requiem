@@ -1,4 +1,4 @@
-import {Actor, Color, type Engine, type SpriteSheet, Timer} from 'excalibur';
+import {Actor, Color, type Engine, type SpriteSheet, Timer, vec} from 'excalibur';
 import {Resources} from '@/resources.ts';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import type {DamageTaker} from '@/entities/interfaces/DamageTaker.ts';
@@ -7,6 +7,7 @@ import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
 import {Explosion, ExplosionType} from '@/entities/Explosion.ts';
 import type {DamageProvider} from '@/entities/interfaces/DamageProvider.ts';
 import {GAME} from '@/main.ts';
+import {damageNumber} from '@/entities/Label.ts';
 
 // значение - кадр в спрайте
 export const EnemyType = {
@@ -142,11 +143,9 @@ export class Enemy extends Actor implements DamageTaker, DamageProvider {
     }
 
     public takeDamage(damage: number) {
-        // todo выводить цифру сколько урона нанесено
         this.health -= damage;
 
         const sprite = this.graphics.current;
-
         if (sprite) {
             sprite.tint = Color.Orange;
             GAME.add(new Timer({
@@ -155,7 +154,11 @@ export class Enemy extends Actor implements DamageTaker, DamageProvider {
             }).start());
         }
 
-        if (this.health <= 0) this.explode()
+        damageNumber(damage, this.pos.add(vec(this.width / 2, 0)), this.health <= 0)
+
+        if (this.health <= 0) {
+            this.explode();
+        }
     }
 
     public get damage(): number {
