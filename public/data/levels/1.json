@@ -2,6 +2,44 @@
     "id": 1,
     "timeline": [
         {
+            "type": "dialog",
+            "conf": {
+                "startMonolog": 0,
+                "monologues": [
+                    {
+                        "npc": "glorp",
+                        "name": "Glorp",
+                        "text": "nky zoogle, zeekybooble beeble meep forp bogos binted?",
+                        "time": 2500,
+                        "answers": [
+                            {
+                                "text": "vrop?"
+                            },
+                            {
+                                "text": "Photos printed?",
+                                "nextMonolog": 1
+                            }
+                        ]
+                    },
+                    {
+                        "npc": "general",
+                        "name": "Human",
+                        "text": "yes"
+                    },
+                    {
+                        "npc": "glorp",
+                        "name": "Glorp",
+                        "text": "bogos binted",
+                        "answers": [
+                            {
+                                "text": "zob"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
             "type": "wave",
             "conf": {
                 "count": 20,

@@ -1,4 +1,4 @@
-import {Actor, type Animation, CollisionType, type Engine, RentalPool, Timer, vec, Vector} from 'excalibur';
+import {Actor, type Animation, CollisionType, type Engine, RentalPool, Scene, Timer, vec, Vector} from 'excalibur';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import type {InputPlayer} from '@/helpers/input/InputPlayer.ts';
@@ -9,6 +9,7 @@ import {BulletType} from '@/entities/Bullet.ts';
 import {Exhaust, ExhaustType} from '@/entities/Exhaust.ts';
 import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
 import {random} from '@/utils/math.ts';
+import {EventBus, Events} from '@/helpers/events/EventBus.ts';
 
 export const PlayerType = {
     White: 0,
@@ -33,6 +34,7 @@ export class Player extends Actor {
     protected maxSpeed = 50;
     protected fireInterval = 250;
     protected bulletDamage = 10;
+    protected frozen = false;
 
     public constructor(type: AnyPlayerType = PlayerType.White, bulletType: AnyBulletType = BulletType.Bit) {
         super({
@@ -107,6 +109,14 @@ export class Player extends Actor {
         }
     }
 
+    protected freeze(): void {
+        this.frozen = true;
+    }
+
+    protected unfreeze(): void {
+        this.frozen = false;
+    }
+
     public onInitialize(_engine: Engine) {
         this.sprite = sprite(Resources.SpritePlayers)
             .autoWidth(3)
@@ -127,15 +137,31 @@ export class Player extends Actor {
         );
 
         this.scene?.add(this.fireTimer);
+
+        EventBus.on(Events.DialogStarted, this.freeze.bind(this));
+        EventBus.on(Events.DialogEnded, this.unfreeze.bind(this));
+    }
+
+    public onPostKill(_scene: Scene) {
+        EventBus.off(Events.DialogStarted, this.freeze.bind(this));
+        EventBus.off(Events.DialogEnded, this.unfreeze.bind(this));
     }
 
     public onPreUpdate(_engine: Engine, _elapsed: number) {
         const velocity = vec(0, 0);
 
-        if (this.input.is(Actions.Left)) velocity.x--;
-        if (this.input.is(Actions.Right)) velocity.x++;
-        if (this.input.is(Actions.Up)) velocity.y--;
-        if (this.input.is(Actions.Down)) velocity.y++;
+        if (!this.frozen) {
+            if (this.input.is(Actions.Left)) velocity.x--;
+            if (this.input.is(Actions.Right)) velocity.x++;
+            if (this.input.is(Actions.Up)) velocity.y--;
+            if (this.input.is(Actions.Down)) velocity.y++;
+
+            if (this.input.started(Actions.Fire)) {
+                this.fireTimer.start()
+            } else if (this.input.ended(Actions.Fire)) {
+                this.fireTimer.stop();
+            }
+        }
 
         if (velocity.x > 0) this.sprite?.goToFrame(2);
         else if (velocity.x < 0) this.sprite?.goToFrame(0);
@@ -143,12 +169,6 @@ export class Player extends Actor {
 
         this.body.vel = velocity.normalize().scaleEqual(this.maxSpeed);
         this.moveExhaust();
-
-        if (this.input.started(Actions.Fire)) {
-            this.fireTimer.start()
-        } else if (this.input.ended(Actions.Fire)) {
-            this.fireTimer.stop();
-        }
     }
 
     public getSpeed(): Vector {

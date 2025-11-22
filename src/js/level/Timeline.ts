@@ -1,9 +1,12 @@
 import type {Engine, OnPreUpdate} from 'excalibur';
 import {type EnemyWaveConf, EnemyWaveFactory} from '@/level/events/enemyWave/EnemeWaveFactory.ts';
 import type {EnemyWave} from '@/level/events/enemyWave/EnemyWave.ts';
+import type {DialogConf} from '@/level/events/dialog/Dialog.ts';
+import {Dialog} from '@/level/events/dialog/Dialog.ts';
 
 const TimelineEventType = {
     Wave: 'wave',
+    Dialog: 'dialog',
 } as const;
 
 type TimelineEventWaveConf = {
@@ -11,9 +14,14 @@ type TimelineEventWaveConf = {
     conf: EnemyWaveConf,
 }
 
-export type TimelineEventConf = ({ delay?: number } | { time: number }) & (TimelineEventWaveConf); // todo | OtherEventConf | OtherEventConf
+type TimelineEventDialogConf = {
+    type: typeof TimelineEventType.Dialog,
+    conf: DialogConf,
+}
 
-type TimelineEvent = EnemyWave; // todo | OtherEventClass | OtherEventClass
+export type TimelineEventConf = ({ delay?: number } | { time: number }) & (TimelineEventWaveConf | TimelineEventDialogConf);
+
+type TimelineEvent = EnemyWave | Dialog;
 
 export class Timeline implements OnPreUpdate {
     protected plannedEvents: {time: number, event: TimelineEvent}[] = [];
@@ -34,6 +42,11 @@ export class Timeline implements OnPreUpdate {
                     return {
                         time: time,
                         event: EnemyWaveFactory.create(eventConf.conf),
+                    };
+                case TimelineEventType.Dialog:
+                    return {
+                        time: time,
+                        event: Dialog.create(eventConf.conf),
                     };
             }
         }).sort((a, b) => a.time - b.time);
