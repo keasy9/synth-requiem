@@ -1,6 +1,7 @@
 import {Actor, type Animation, AnimationStrategy, type Engine} from 'excalibur';
 import {Resources} from '@/resources.ts';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
+import type {EnumValue} from '@/utils/types.ts';
 
 export const ExhaustType = {
     Small: 0,
@@ -8,14 +9,14 @@ export const ExhaustType = {
     Large: 2,
 } as const;
 
-type AnyExhaustType = typeof ExhaustType[keyof typeof ExhaustType];
+type AnyExhaustType = EnumValue<typeof ExhaustType>;
 
 export const ExhaustColor = {
     Orange: 1,
     Green: 2,
 }
 
-type AnyExhaustColor = typeof ExhaustColor[keyof typeof ExhaustColor];
+type AnyExhaustColor = EnumValue<typeof ExhaustColor>;
 
 // todo цвет
 export class Exhaust extends Actor {

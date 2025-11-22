@@ -10,6 +10,7 @@ import {Exhaust, ExhaustType} from '@/entities/Exhaust.ts';
 import {CollisionGroups} from '@/helpers/physics/CollisionGroups.ts';
 import {random} from '@/utils/math.ts';
 import {EventBus, Events} from '@/helpers/events/EventBus.ts';
+import type {EnumValue} from '@/utils/types.ts';
 
 export const PlayerType = {
     White: 0,
@@ -19,7 +20,7 @@ export const PlayerType = {
     Red: 4,
 } as const;
 
-export type AnyPlayerType = typeof PlayerType[keyof typeof PlayerType];
+export type AnyPlayerType = EnumValue<typeof PlayerType>;
 
 export class Player extends Actor {
     protected static bullets: RentalPool<Bullet>;

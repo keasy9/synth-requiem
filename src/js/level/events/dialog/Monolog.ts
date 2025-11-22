@@ -1,6 +1,7 @@
 import {type Animation, AnimationStrategy, ScreenElement, vec} from 'excalibur';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
+import type {EnumValue} from '@/utils/types.ts';
 
 const NpcPortrait = {
     General: 'general',
@@ -16,7 +17,7 @@ const NpcPortrait = {
     Noice: 'noice',
 } as const;
 
-type AnyNpcPortrait = typeof NpcPortrait[keyof typeof NpcPortrait];
+type AnyNpcPortrait = EnumValue<typeof NpcPortrait>;
 
 const NpcPortraitTypeToSpriteRow = {
     [NpcPortrait.General]: 0,

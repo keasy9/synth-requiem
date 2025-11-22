@@ -1,9 +1,11 @@
+import type {EnumValue} from '@/utils/types.ts';
+
 export const MovementType = {
     Linear: 'linear',
 } as const;
 
 interface MovementConf {
-    type: typeof MovementType[keyof typeof MovementType],
+    type: EnumValue<typeof MovementType>,
     // скорость движения
     speed: number,
     // угол в радианах

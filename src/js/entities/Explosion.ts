@@ -11,6 +11,7 @@ import {
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import {GAME} from '@/main.ts';
+import type {EnumValue} from '@/utils/types.ts';
 
 // значение - строка в спрайте
 export const ExplosionType = {
@@ -19,7 +20,7 @@ export const ExplosionType = {
     Blue: 2,
 } as const;
 
-export type AnyExplosionType = typeof ExplosionType[keyof typeof ExplosionType];
+export type AnyExplosionType = EnumValue<typeof ExplosionType>;
 
 export class Explosion extends Entity<GraphicsComponent | TransformComponent> {
 

@@ -1,3 +1,5 @@
+import type {EnumValue} from '@/utils/types.ts';
+
 export const Actions = {
     Left: 'left',
     Right: 'right',
@@ -6,7 +8,7 @@ export const Actions = {
     Fire: 'fire',
 } as const;
 
-export type ActionKey = typeof Actions[keyof typeof Actions];
+export type ActionKey = EnumValue<typeof Actions>;
 
 export const InputSourceType = {
     Keyboard: 'keyboard',
@@ -14,7 +16,7 @@ export const InputSourceType = {
     // todo pointer
 } as const;
 
-export type AnyInputSourceType = typeof InputSourceType[keyof typeof InputSourceType];
+export type AnyInputSourceType = EnumValue<typeof InputSourceType>;
 
 export interface InputSource {
     readonly type: AnyInputSourceType;

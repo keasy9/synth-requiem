@@ -1,9 +1,11 @@
+import type {EnumValue} from '@/utils/types.ts';
+
 export const FormationType = {
     Grid: 'grid',
 } as const;
 
 interface FormationConf {
-    type: typeof FormationType[keyof typeof FormationType];
+    type: EnumValue<typeof FormationType>;
 }
 
 export interface GridFormationConf extends FormationConf {

@@ -2,13 +2,14 @@ import type {ActionKey, InputSource} from '@/helpers/input/sources/InputSource.t
 import {Actions, InputSourceType} from '@/helpers/input/sources/InputSource.ts';
 import {Axes, Buttons} from 'excalibur';
 import {GAME} from '@/main.ts';
+import type {EnumValue} from '@/utils/types.ts';
 
 const AxisDirection = {
     Positive: '+',
     Negative: '-',
 };
 
-type AxisDirectionKey = typeof AxisDirection[keyof typeof AxisDirection];
+type AxisDirectionKey = EnumValue<typeof AxisDirection>;
 
 export type GamepadBindings = {
     buttons: Partial<Record<ActionKey, Buttons[]>>,

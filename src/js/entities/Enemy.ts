@@ -8,6 +8,7 @@ import {Explosion, ExplosionType} from '@/entities/Explosion.ts';
 import type {DamageProvider} from '@/entities/interfaces/DamageProvider.ts';
 import {GAME} from '@/main.ts';
 import {damageNumber} from '@/entities/Label.ts';
+import type {EnumValue} from '@/utils/types.ts';
 
 // значение - кадр в спрайте
 export const EnemyType = {
@@ -49,7 +50,7 @@ export const EnemyType = {
     Glider: 36,
 } as const;
 
-export type AnyEnemyType = typeof EnemyType[keyof typeof EnemyType];
+export type AnyEnemyType = EnumValue<typeof EnemyType>;
 
 export const EnemySizeMap = {
     [EnemyType.White]: {width: 5, height: 5},

@@ -4,6 +4,7 @@ import {Resources} from '@/resources.ts';
 import type {DamageProvider} from '@/entities/interfaces/DamageProvider.ts';
 import {collide} from '@/helpers/physics/Collider.ts';
 import type {DamageTaker} from '@/entities/interfaces/DamageTaker.ts';
+import type {EnumValue} from '@/utils/types.ts';
 
 export const BulletType = {
     Wave: 0,
@@ -22,7 +23,7 @@ export const BulletType = {
     Ring: 13,
 } as const;
 
-export type AnyBulletType = typeof BulletType[keyof typeof BulletType];
+export type AnyBulletType = EnumValue<typeof BulletType>;
 
 const BulletSizeMap = {
     [BulletType.Wave]: {width: 3, height: 6},
