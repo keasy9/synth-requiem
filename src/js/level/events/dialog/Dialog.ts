@@ -1,12 +1,59 @@
 import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
-import type {Engine} from 'excalibur';
+import {type Animation, AnimationStrategy, type Engine} from 'excalibur';
 import {EventBus, Events} from '@/helpers/events/EventBus.ts';
-import {type MonologConf} from '@/level/events/dialog/Monolog.ts';
 import type {UiContainerDto} from '@/helpers/ui/container/UiContainerDto.ts';
 import {ui} from '@/helpers/ui/Ui.ts';
 import type {UiTextboxDto} from '@/helpers/ui/textbox/UiTextboxDto.ts';
 import type {UiBarDto} from '@/helpers/ui/bar/UiBarDto.ts';
 import {UiAnchor} from '@/helpers/ui/UiElemBuilder.ts';
+import type {EnumValue} from '@/utils/types.ts';
+import type {UiSpriteDto} from '@/helpers/ui/sprite/UiSpriteDto.ts';
+import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
+import {Resources} from '@/resources.ts';
+
+const NpcPortrait = {
+    General: 'general',
+    Astronaut: 'astronaut',
+    Soldier: 'soldier',
+    Glorp: 'glorp',
+    Engineer: 'engineer',
+    Snail: 'snail',
+    Deer: 'deer',
+    Emoji: 'emoji',
+    Girl: 'girl',
+    Ant: 'ant',
+    Noice: 'noice',
+} as const;
+
+type AnyNpcPortrait = EnumValue<typeof NpcPortrait>;
+
+const NpcPortraitTypeToSpriteRow = {
+    [NpcPortrait.General]: 0,
+    [NpcPortrait.Astronaut]: 1,
+    [NpcPortrait.Soldier]: 2,
+    [NpcPortrait.Glorp]: 3,
+    [NpcPortrait.Engineer]: 4,
+    [NpcPortrait.Snail]: 5,
+    [NpcPortrait.Deer]: 6,
+    [NpcPortrait.Emoji]: 7,
+    [NpcPortrait.Girl]: 8,
+    [NpcPortrait.Ant]: 9,
+    [NpcPortrait.Noice]: 10,
+} as const;
+
+type MonologAnswer = {
+    text: string,
+    nextMonolog?: number, // индекс в monologues родительского диалога
+}
+
+export type MonologConf = {
+    npc: AnyNpcPortrait,
+    name: string,
+    text: string, // todo локализация, и цветные вставки как в katana zero
+    answers?: MonologAnswer[],
+    nextMonolog?: number, // индекс в monologues родительского диалога
+    time?: number,
+}
 
 export type DialogConf = {
     startMonolog: number, // индекс в monologues
@@ -14,14 +61,18 @@ export type DialogConf = {
 }
 
 export class Dialog implements TimelineEvent {
+    protected static npcPortraits: Partial<Record<AnyNpcPortrait, Animation>> = {};
+
     protected isStarted: boolean = false;
     protected conf: DialogConf;
     protected currentMonolog?: MonologConf;
 
     protected rootContainer?: UiContainerDto;
     protected textbox?: UiTextboxDto;
+    protected name?: UiTextboxDto;
     protected buttonsContainer?: UiContainerDto;
     protected bar?: UiBarDto;
+    protected npcPortrait?: UiSpriteDto;
 
     public static create(conf: DialogConf): Dialog {
         return new Dialog(conf);
@@ -44,23 +95,51 @@ export class Dialog implements TimelineEvent {
     }
 
     public start(): this {
-        this.currentMonolog = this.conf.monologues[this.conf.startMonolog];
         this.isStarted = true;
+        this.setMonolog(this.conf.monologues[this.conf.startMonolog]!);
 
         EventBus.emit(Events.DialogStarted);
 
-
-        this.textbox = ui().text(this.currentMonolog!.text).get();
-        this.rootContainer = ui().box().at(UiAnchor.Bottom).with(
-                ui()
-                    .box()
-                    .asCols()
-                    .with(
-                        // todo sprite
-                        this.textbox,
-                    )
-            ).show();
-
         return this;
+    }
+
+    protected setMonolog(conf: MonologConf): void {
+        this.setText(conf.text);
+        this.setNpc(conf.npc);
+        this.setName(conf.name);
+
+        this.rootContainer ??= ui().box().at(UiAnchor.Bottom).with(
+            ui()
+                .box()
+                .asCols()
+                .with(
+                    ui().box().asRows().with(
+                        this.npcPortrait!,
+                        this.name!,
+                    ),
+                    this.textbox!,
+                )
+        ).show();
+    }
+
+    protected setText(text: string): void {
+        if (!this.textbox) this.textbox = ui().text(text).get();
+        else this.textbox.content = text;
+    }
+
+    protected setNpc(npc: AnyNpcPortrait): void {
+        Dialog.npcPortraits[npc] ??= sprite(Resources.SpriteCharacters)
+            .autoRows(8)
+            .autoCols(8)
+            .row(NpcPortraitTypeToSpriteRow[npc])
+            .anim(AnimationStrategy.PingPong, 300);
+
+        if (!this.npcPortrait) this.npcPortrait = ui().sprite(Dialog.npcPortraits[npc]).scale(2).get();
+        else this.npcPortrait.setFramesFrom(Dialog.npcPortraits[npc]!);
+    }
+
+    protected setName(name: string): void {
+        if (!this.name) this.name = ui().text(name).get();
+        else this.name.content = name;
     }
 }

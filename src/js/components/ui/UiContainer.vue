@@ -25,6 +25,8 @@
     import {UiTextboxDto} from '@/helpers/ui/textbox/UiTextboxDto.ts';
     import UiTextbox from '@/components/ui/UiTextbox.vue';
     import UiContainer from '@/components/ui/UiContainer.vue';
+    import {UiSpriteDto} from '@/helpers/ui/sprite/UiSpriteDto.ts';
+    import UiSprite from '@/components/ui/UiSprite.vue';
 
     const props = defineProps<{ dto: UiContainerDto }>();
 
@@ -33,6 +35,7 @@
         else if (elem instanceof UiButtonDto) return UiButton;
         else if (elem instanceof UiContainerDto) return UiContainer;
         else if (elem instanceof UiTextboxDto) return UiTextbox;
+        else if (elem instanceof UiSpriteDto) return UiSprite;
 
         return undefined
     }
@@ -42,7 +45,50 @@
         else if (elem instanceof UiButtonDto) return 'ui-container__elem--button';
         else if (elem instanceof UiContainerDto) return 'ui-container__elem--container';
         else if (elem instanceof UiTextboxDto) return 'ui-container__elem--textbox';
+        else if (elem instanceof UiSpriteDto) return 'ui-container__elem--sprite';
 
         return '';
     }
 </script>
+
+<style lang="less">
+    .ui-container {
+        &--cols {
+            display: flex;
+
+            .ui-container {
+                &__elem {
+                    flex-grow: 1;
+
+                    &--container,
+                    &--sprite {
+                        flex-grow: 0;
+                    }
+
+                    &--container {
+                        .ui-container__elem {
+                            border-right: none;
+                        }
+                    }
+
+                    &:not(:last-child) {
+                        border-right: none;
+                    }
+                }
+            }
+        }
+
+        &--rows {
+            display: flex;
+            flex-direction: column;
+
+            .ui-container {
+                &__elem {
+                    &:not(:last-child) {
+                        border-bottom: none;
+                    }
+                }
+            }
+        }
+    }
+</style>

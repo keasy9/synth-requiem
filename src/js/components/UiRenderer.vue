@@ -27,12 +27,15 @@
     import UiTextbox from '@/components/ui/UiTextbox.vue';
     import {type Component, ref} from 'vue';
     import {Config} from '@/config.ts';
+    import UiSprite from '@/components/ui/UiSprite.vue';
+    import {UiSpriteDto} from '@/helpers/ui/sprite/UiSpriteDto.ts';
 
     function getComponentType(elem: UiElemDto): Component|undefined {
         if (elem instanceof UiBarDto) return UiBar;
         else if (elem instanceof UiButtonDto) return UiButton;
         else if (elem instanceof UiContainerDto) return UiContainer;
         else if (elem instanceof UiTextboxDto) return UiTextbox;
+        else if (elem instanceof UiSpriteDto) return UiSprite;
 
         return undefined
     }
@@ -42,6 +45,7 @@
         else if (elem instanceof UiButtonDto) return 'ui__elem--button';
         else if (elem instanceof UiContainerDto) return 'ui__elem--container';
         else if (elem instanceof UiTextboxDto) return 'ui__elem--textbox';
+        else if (elem instanceof UiSpriteDto) return 'ui__elem--sprite';
 
         return '';
     }
@@ -64,6 +68,7 @@
         right: 0;
         pointer-events: none;
         z-index: 100;
+        image-rendering: pixelated;
 
         &__elem {
             position: absolute;
