@@ -2,7 +2,7 @@ import {BoundingBox, Engine} from 'excalibur';
 import {Config} from '@/config.ts';
 import {Batches} from '@/resources.ts';
 import {createApp} from 'vue';
-import UiManager from '@/components/UiManager.vue';
+import UiRenderer from '@/components/UiRenderer.vue';
 
 class Game extends Engine {
     public get screenBox(): BoundingBox {
@@ -24,4 +24,4 @@ GAME.start(Batches.Main).then(() => {
     GAME.goToScene('level');
 });
 
-createApp(UiManager).mount('#ui');
+createApp(UiRenderer).mount('#ui');

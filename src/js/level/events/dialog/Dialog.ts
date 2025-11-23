@@ -1,8 +1,12 @@
 import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
 import type {Engine} from 'excalibur';
 import {EventBus, Events} from '@/helpers/events/EventBus.ts';
-import {Monolog, type MonologConf} from '@/level/events/dialog/Monolog.ts';
-import {GAME} from '@/main.ts';
+import {type MonologConf} from '@/level/events/dialog/Monolog.ts';
+import type {UiContainerDto} from '@/helpers/ui/container/UiContainerDto.ts';
+import {ui} from '@/helpers/ui/Ui.ts';
+import type {UiTextboxDto} from '@/helpers/ui/textbox/UiTextboxDto.ts';
+import type {UiBarDto} from '@/helpers/ui/bar/UiBarDto.ts';
+import {UiAnchor} from '@/helpers/ui/UiElemBuilder.ts';
 
 export type DialogConf = {
     startMonolog: number, // индекс в monologues
@@ -13,7 +17,11 @@ export class Dialog implements TimelineEvent {
     protected isStarted: boolean = false;
     protected conf: DialogConf;
     protected currentMonolog?: MonologConf;
-    protected monologInstance?: Monolog;
+
+    protected rootContainer?: UiContainerDto;
+    protected textbox?: UiTextboxDto;
+    protected buttonsContainer?: UiContainerDto;
+    protected bar?: UiBarDto;
 
     public static create(conf: DialogConf): Dialog {
         return new Dialog(conf);
@@ -32,6 +40,7 @@ export class Dialog implements TimelineEvent {
     }
 
     public onPreUpdate(_engine: Engine, _elapsed: number): void {
+        //
     }
 
     public start(): this {
@@ -40,8 +49,17 @@ export class Dialog implements TimelineEvent {
 
         EventBus.emit(Events.DialogStarted);
 
-        this.monologInstance = Monolog.create(this.currentMonolog!);
-        GAME.add(this.monologInstance);
+
+        this.textbox = ui().text(this.currentMonolog!.text).get();
+        this.rootContainer = ui().box().at(UiAnchor.Bottom).with(
+                ui()
+                    .box()
+                    .asCols()
+                    .with(
+                        // todo sprite
+                        this.textbox,
+                    )
+            ).show();
 
         return this;
     }
