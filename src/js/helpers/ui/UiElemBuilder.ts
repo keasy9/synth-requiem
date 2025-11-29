@@ -1,5 +1,6 @@
 import type {UiElemDto} from '@/helpers/ui/UiElemDto.ts';
 import type {EnumValue} from '@/utils/types.ts';
+import type {Reactive} from 'vue';
 
 export const UiAnchor = {
     Center: 'center', // по центру экрана
@@ -23,10 +24,10 @@ export abstract class UiElemBuilder {
     /**
      * Вывести элемент на экран.
      */
-    public abstract show(): UiElemDto;
+    public abstract show(): Reactive<UiElemDto>;
 
     /**
      * Получить экземпляр элемента, не выводя его на экран.
      */
-    public abstract get(): UiElemDto;
+    public abstract get(): Reactive<UiElemDto>;
 }

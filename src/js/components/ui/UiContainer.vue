@@ -1,12 +1,15 @@
 <template>
     <div
         class="ui-container"
-        :class="{ [`ui-container--${dto.layout}`]: dto.layout }"
+        :class="{
+            [`ui-container--${dto.layout}`]: dto.layout,
+            'ui-container--gap': dto.gap,
+        }"
     >
         <component
             class="ui-container__elem"
-            v-for="(elem, index) in dto.children"
-            :key="index"
+            v-for="elem in dto.children"
+            :key="elem.id"
             :class="{ [getComponentClass(elem)]: true }"
             :is="getComponentType(elem)"
             :dto="elem"
@@ -16,7 +19,7 @@
 
 <script setup lang="ts">
     import {UiContainerDto} from '@/helpers/ui/container/UiContainerDto.ts';
-    import type {Component} from 'vue';
+    import {type Component, computed} from 'vue';
     import type {UiElemDto} from '@/helpers/ui/UiElemDto.ts';
     import {UiBarDto} from '@/helpers/ui/bar/UiBarDto.ts';
     import UiBar from '@/components/ui/UiBar.vue';
@@ -27,8 +30,11 @@
     import UiContainer from '@/components/ui/UiContainer.vue';
     import {UiSpriteDto} from '@/helpers/ui/sprite/UiSpriteDto.ts';
     import UiSprite from '@/components/ui/UiSprite.vue';
+    import {Config} from '@/config.ts';
 
     const props = defineProps<{ dto: UiContainerDto }>();
+
+    const gap = computed(() => props.dto.gap * Config.pixelRatio + 'px');
 
     function getComponentType(elem: UiElemDto): Component|undefined {
         if (elem instanceof UiBarDto) return UiBar;
@@ -64,14 +70,16 @@
                     &--sprite {
                         flex-grow: 0;
                     }
+                }
+            }
 
-                    &--container {
-                        .ui-container__elem {
-                            border-right: none;
-                        }
+            &:not(.ui-container--gap) {
+                & > .ui-container__elem {
+                    &:not(:last-child) {
+                        border-right: none;
                     }
 
-                    &:not(:last-child) {
+                    &--container > .ui-container__elem {
                         border-right: none;
                     }
                 }
@@ -82,13 +90,21 @@
             display: flex;
             flex-direction: column;
 
-            .ui-container {
-                &__elem {
-                    &:not(:last-child) {
-                        border-bottom: none;
+            .ui-container:not(.ui-container--gap) {
+                .ui-container {
+                    &__elem {
+                        &:not(:last-child) {
+                            border-bottom: none;
+                        }
                     }
                 }
             }
         }
+    }
+</style>
+
+<style scoped lang="less">
+    .ui-container {
+        gap: v-bind(gap);
     }
 </style>

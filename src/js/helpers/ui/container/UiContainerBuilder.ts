@@ -1,29 +1,52 @@
 import {UiElemBuilder} from '@/helpers/ui/UiElemBuilder.ts';
 import {type AnyUiContainerLayout, UiContainerDto, UiContainerLayout} from '@/helpers/ui/container/UiContainerDto.ts';
 import type {UiElemDto} from '@/helpers/ui/UiElemDto.ts';
-import {UiState} from '@/helpers/ui/State.ts';
+import {type Reactive, reactive} from 'vue';
 
 export class UiContainerBuilder extends UiElemBuilder {
-    protected _children: UiElemDto[] = [];
+    protected _children: Reactive<UiElemDto>[] = [];
     protected _layout: AnyUiContainerLayout = UiContainerLayout.Rows;
+    protected _gap: number = 0;
 
+    /**
+     * Расположить элементы контейнера строками.
+     */
     public asRows(): this {
         this._layout = UiContainerLayout.Rows;
         return this;
     }
 
+    /**
+     * Расположить элементы контейнера колонками
+     */
     public asCols(): this {
         this._layout = UiContainerLayout.Cols;
         return this;
     }
 
+    /**
+     * Расположить элементы контейнера по сетке.
+     */
     public asGrid(): this {
         this._layout = UiContainerLayout.AutoGrid;
         return this;
     }
 
+    /**
+     * Установить способ расположения элементов контейнера.
+     * @param layout
+     */
     public layout(layout: AnyUiContainerLayout): this {
         this._layout = layout;
+        return this;
+    }
+
+    /**
+     * Устновить отступ между элементами контейнера.
+     * @param gap
+     */
+    public gap(gap: number): this {
+        this._gap = gap;
         return this;
     }
 
@@ -31,7 +54,7 @@ export class UiContainerBuilder extends UiElemBuilder {
      * Добавить в контейнер элементы. Можно передавать билдеры элементов.
      * @param children
      */
-    public with(...children: (UiElemDto|UiElemBuilder)[]): this {
+    public with(...children: (UiElemDto|UiElemBuilder|Reactive<UiElemDto>)[]): this {
         children.forEach(child => {
             if (child instanceof UiElemBuilder) this._children.push(child.get());
             else this._children.push(child);
@@ -43,12 +66,13 @@ export class UiContainerBuilder extends UiElemBuilder {
     /**
      * @inheritDoc
      */
-    public get(): UiContainerDto {
-        const instance = new UiContainerDto();
+    public get(): Reactive<UiContainerDto> {
+        const instance = reactive(new UiContainerDto());
 
         instance.children = this._children;
         instance.layout = this._layout;
         instance.anchor = this._anchor;
+        instance.gap = this._gap;
 
         return instance;
     }
@@ -56,9 +80,10 @@ export class UiContainerBuilder extends UiElemBuilder {
     /**
      * @inheritDoc
      */
-    public show(): UiContainerDto {
+    public show(): Reactive<UiContainerDto> {
         const dto = this.get();
-        UiState.push(dto);
+
+        dto.show();
 
         return dto;
     }

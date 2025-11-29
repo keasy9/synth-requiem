@@ -13,7 +13,8 @@
                         "time": 2500,
                         "answers": [
                             {
-                                "text": "vrop?"
+                                "text": "vrop?",
+                                "nextMonolog": 2
                             },
                             {
                                 "text": "Photos printed?",
@@ -24,7 +25,12 @@
                     {
                         "npc": "general",
                         "name": "Human",
-                        "text": "yes"
+                        "text": "yes",
+                        "answers": [
+                            {
+                                "text": "ok"
+                            }
+                        ]
                     },
                     {
                         "npc": "glorp",
@@ -41,6 +47,7 @@
         },
         {
             "type": "wave",
+            "delay": 500,
             "conf": {
                 "count": 20,
                 "type": 0,

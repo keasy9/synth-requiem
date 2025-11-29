@@ -2,8 +2,8 @@
     <div class="ui">
         <component
             class="ui__elem"
-            v-for="(elem, index) in UiState"
-            :key="index"
+            v-for="elem in UiState"
+            :key="elem.id"
             :class="{
                 [`ui__elem--${elem.anchor}`]: elem.anchor,
                 [getComponentClass(elem)]: true
@@ -58,8 +58,8 @@
         --pixel-ratio: v-bind(pixelRatio);
         --1-pix: calc(var(--pixel-ratio) * 1px);
 
-        --c-white: white;
-        --c-black-faded: rgba(0, 0, 0, .7);
+        --c-white: #FFFFFFFF;
+        --c-black-faded: #000000B2;
 
         position: absolute;
         top: 0;

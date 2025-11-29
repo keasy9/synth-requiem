@@ -1,7 +1,7 @@
 import {UiElemBuilder} from '@/helpers/ui/UiElemBuilder.ts';
-import {UiState} from '@/helpers/ui/State.ts';
 import {type SpriteFrameDto, UiSpriteDto} from '@/helpers/ui/sprite/UiSpriteDto.ts';
 import {type Animation, AnimationStrategy, Sprite} from 'excalibur';
+import {type Reactive, reactive} from 'vue';
 
 export class UiSpriteBuilder extends UiElemBuilder {
     protected _frames: SpriteFrameDto[] = [];
@@ -76,8 +76,8 @@ export class UiSpriteBuilder extends UiElemBuilder {
     /**
      * @inheritDoc
      */
-    public get(): UiSpriteDto {
-        const instance = new UiSpriteDto();
+    public get(): Reactive<UiSpriteDto> {
+        const instance = reactive(new UiSpriteDto());
 
         instance.frames = this._frames;
         instance.frameDuration = this._frameDuration;
@@ -92,9 +92,10 @@ export class UiSpriteBuilder extends UiElemBuilder {
     /**
      * @inheritDoc
      */
-    public show(): UiSpriteDto {
+    public show(): Reactive<UiSpriteDto> {
         const dto = this.get();
-        UiState.push(dto);
+
+        dto.show();
 
         return dto;
     }

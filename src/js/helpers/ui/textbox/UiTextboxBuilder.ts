@@ -1,6 +1,6 @@
 import {UiElemBuilder} from '@/helpers/ui/UiElemBuilder.ts';
 import {UiTextboxDto} from '@/helpers/ui/textbox/UiTextboxDto.ts';
-import {UiState} from '@/helpers/ui/State.ts';
+import {type Reactive, reactive} from 'vue';
 
 export class UiTextboxBuilder extends UiElemBuilder {
     protected _content: string = '';
@@ -35,8 +35,8 @@ export class UiTextboxBuilder extends UiElemBuilder {
     /**
      * @inheritDoc
      */
-    public get(): UiTextboxDto {
-        const instance = new UiTextboxDto();
+    public get(): Reactive<UiTextboxDto> {
+        const instance = reactive(new UiTextboxDto());
 
         instance.content = this._content;
         instance.anchor = this._anchor;
@@ -48,9 +48,10 @@ export class UiTextboxBuilder extends UiElemBuilder {
     /**
      * @inheritDoc
      */
-    public show(): UiTextboxDto {
+    public show(): Reactive<UiTextboxDto> {
         const dto = this.get();
-        UiState.push(dto);
+
+        dto.show();
 
         return dto;
     }

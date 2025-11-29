@@ -10,6 +10,7 @@ import type {EnumValue} from '@/utils/types.ts';
 import type {UiSpriteDto} from '@/helpers/ui/sprite/UiSpriteDto.ts';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
+import type {Reactive} from 'vue';
 
 const NpcPortrait = {
     General: 'general',
@@ -67,12 +68,12 @@ export class Dialog implements TimelineEvent {
     protected conf: DialogConf;
     protected currentMonolog?: MonologConf;
 
-    protected rootContainer?: UiContainerDto;
-    protected textbox?: UiTextboxDto;
-    protected name?: UiTextboxDto;
-    protected buttonsContainer?: UiContainerDto;
-    protected bar?: UiBarDto;
-    protected npcPortrait?: UiSpriteDto;
+    protected rootContainer?: Reactive<UiContainerDto>;
+    protected textbox?: Reactive<UiTextboxDto>;
+    protected name?: Reactive<UiTextboxDto>;
+    protected buttonsContainer?: Reactive<UiContainerDto>;
+    protected bar?: Reactive<UiBarDto>;
+    protected npcPortrait?: Reactive<UiSpriteDto>;
 
     public static create(conf: DialogConf): Dialog {
         return new Dialog(conf);
@@ -107,19 +108,27 @@ export class Dialog implements TimelineEvent {
         this.setText(conf.text);
         this.setNpc(conf.npc);
         this.setName(conf.name);
+        this.setAnswers(conf.answers ?? []);
 
-        this.rootContainer ??= ui().box().at(UiAnchor.Bottom).with(
-            ui()
-                .box()
-                .asCols()
-                .with(
-                    ui().box().asRows().with(
-                        this.npcPortrait!,
-                        this.name!,
+        this.rootContainer ??= ui()
+            .box()
+            .at(UiAnchor.Bottom)
+            .gap(2)
+            .with(
+                ui()
+                    .box()
+                    .asCols()
+                    .with(
+                        ui().box().asRows().with(
+                            this.npcPortrait!,
+                            this.name!,
+                        ),
+                        this.textbox!,
                     ),
-                    this.textbox!,
-                )
-        ).show();
+                this.buttonsContainer!,
+            ).get();
+
+        this.rootContainer.show();
     }
 
     protected setText(text: string): void {
@@ -141,5 +150,28 @@ export class Dialog implements TimelineEvent {
     protected setName(name: string): void {
         if (!this.name) this.name = ui().text(name).get();
         else this.name.content = name;
+    }
+
+    protected setAnswers(answers: MonologAnswer[]): void {
+        this.buttonsContainer ??= ui().box().gap(1).get();
+
+        this.buttonsContainer.children = answers.map(answer => {
+            const btn = ui().button().content(answer.text);
+
+            if ((typeof answer.nextMonolog === 'number') && (answer.nextMonolog in this.conf.monologues)) {
+                btn.onClick(() => this.setMonolog(this.conf.monologues[answer.nextMonolog!]!));
+
+            } else {
+                btn.onClick(this.end.bind(this));
+            }
+
+            return btn.get();
+        });
+    }
+
+    protected end(): void {
+        this.rootContainer?.hide();
+        this.isStarted = false;
+        delete this.currentMonolog;
     }
 }

@@ -1,15 +1,38 @@
 import {UiElemBuilder} from '@/helpers/ui/UiElemBuilder.ts';
-import {UiState} from '@/helpers/ui/State.ts';
 import {UiButtonDto} from '@/helpers/ui/button/UiButtonDto.ts';
+import {type Reactive, reactive} from 'vue';
 
 export class UiButtonBuilder extends UiElemBuilder {
+    protected _content: string = '';
+    protected _onclick?: Function;
+
+    /**
+     * Установить внутренний html.
+     * @param html
+     */
+    public content(html: string): this {
+        this._content = html;
+        return this;
+    }
+
+    /**
+     * Установить коллбэк.
+     * @param callback
+     */
+    public onClick(callback: Function): this {
+        this._onclick = callback;
+        return this;
+    }
+
     /**
      * @inheritDoc
      */
-    public get(): UiButtonDto {
-        const instance = new UiButtonDto();
+    public get(): Reactive<UiButtonDto> {
+        const instance = reactive(new UiButtonDto());
 
         instance.anchor = this._anchor;
+        instance.content = this._content;
+        instance.onclick = this._onclick;
 
         return instance;
     }
@@ -17,9 +40,10 @@ export class UiButtonBuilder extends UiElemBuilder {
     /**
      * @inheritDoc
      */
-    public show(): UiButtonDto {
+    public show(): Reactive<UiButtonDto> {
         const dto = this.get();
-        UiState.push(dto);
+
+        dto.show();
 
         return dto;
     }
