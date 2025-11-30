@@ -1,5 +1,5 @@
 <template>
-    <div class="ui">
+    <div class="ui" ref="root">
         <component
             class="ui__elem"
             v-for="elem in UiState"
@@ -15,20 +15,22 @@
 </template>
 
 <script setup lang="ts">
-    import {UiState} from '@/helpers/ui/State.ts';
-    import type {UiElemDto} from '@/helpers/ui/UiElemDto.ts';
-    import {UiBarDto} from '@/helpers/ui/bar/UiBarDto.ts';
-    import UiBar from '@/components/ui/UiBar.vue';
-    import {UiButtonDto} from '@/helpers/ui/button/UiButtonDto.ts';
-    import {UiContainerDto} from '@/helpers/ui/container/UiContainerDto.ts';
-    import UiContainer from '@/components/ui/UiContainer.vue';
-    import UiButton from '@/components/ui/UiButton.vue';
-    import {UiTextboxDto} from '@/helpers/ui/textbox/UiTextboxDto.ts';
-    import UiTextbox from '@/components/ui/UiTextbox.vue';
-    import {type Component, ref} from 'vue';
+    import {UiState} from '@/ui/State.ts';
+    import type {UiElemDto} from '@/ui/builder/UiElemDto.ts';
+    import {UiBarDto} from '@/ui/builder/bar/UiBarDto.ts';
+    import UiBar from '@/ui/elements/UiBar.vue';
+    import {UiButtonDto} from '@/ui/builder/button/UiButtonDto.ts';
+    import {UiContainerDto} from '@/ui/builder/container/UiContainerDto.ts';
+    import UiContainer from '@/ui/elements/UiContainer.vue';
+    import UiButton from '@/ui/elements/UiButton.vue';
+    import {UiTextboxDto} from '@/ui/builder/textbox/UiTextboxDto.ts';
+    import UiTextbox from '@/ui/elements/UiTextbox.vue';
+    import {type Component, nextTick, ref, useTemplateRef, watch} from 'vue';
     import {Config} from '@/config.ts';
-    import UiSprite from '@/components/ui/UiSprite.vue';
-    import {UiSpriteDto} from '@/helpers/ui/sprite/UiSpriteDto.ts';
+    import UiSprite from '@/ui/elements/UiSprite.vue';
+    import {UiSpriteDto} from '@/ui/builder/sprite/UiSpriteDto.ts';
+
+    const root = useTemplateRef('root');
 
     function getComponentType(elem: UiElemDto): Component|undefined {
         if (elem instanceof UiBarDto) return UiBar;
@@ -51,6 +53,13 @@
     }
 
     const pixelRatio = ref(Config.pixelRatio);
+
+    watch(UiState, () => {
+        nextTick(() => {
+            if (root.value?.querySelector(':focus')) return;
+            root.value?.querySelector('button')?.focus();
+        });
+    }, {immediate: true});
 </script>
 
 <style lang="less">
@@ -58,8 +67,13 @@
         --pixel-ratio: v-bind(pixelRatio);
         --1-pix: calc(var(--pixel-ratio) * 1px);
 
-        --c-white: #FFFFFFFF;
-        --c-black-faded: #000000B2;
+        --c-white: #ffffff;
+        --c-gray: #818793;
+        --c-black-faded: #000000b2;
+
+        --border-width: calc(var(--1-pix) / 2);
+        --border-radius: 0;
+        --border-default: var(--border-width) solid var(--c-white);
 
         position: absolute;
         top: 0;
@@ -69,6 +83,10 @@
         pointer-events: none;
         z-index: 100;
         image-rendering: pixelated;
+
+        *:focus {
+            outline: none;
+        }
 
         &__elem {
             position: absolute;

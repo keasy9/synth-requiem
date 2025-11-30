@@ -1,5 +1,5 @@
-import {UiElemBuilder} from '@/helpers/ui/UiElemBuilder.ts';
-import {type SpriteFrameDto, UiSpriteDto} from '@/helpers/ui/sprite/UiSpriteDto.ts';
+import {UiElemBuilder} from '@/ui/builder/UiElemBuilder.ts';
+import {type SpriteFrameDto, UiSpriteDto} from '@/ui/builder/sprite/UiSpriteDto.ts';
 import {type Animation, AnimationStrategy, Sprite} from 'excalibur';
 import {type Reactive, reactive} from 'vue';
 

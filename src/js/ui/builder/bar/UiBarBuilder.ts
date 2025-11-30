@@ -1,6 +1,6 @@
-import {UiElemBuilder} from '@/helpers/ui/UiElemBuilder.ts';
-import {UiState} from '@/helpers/ui/State.ts';
-import {UiBarDto} from '@/helpers/ui/bar/UiBarDto.ts';
+import {UiElemBuilder} from '@/ui/builder/UiElemBuilder.ts';
+import {UiState} from '@/ui/State.ts';
+import {UiBarDto} from '@/ui/builder/bar/UiBarDto.ts';
 
 export class UiBarBuilder extends UiElemBuilder {
     /**

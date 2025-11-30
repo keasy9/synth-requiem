@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-    import type {SpriteFrameDto, UiSpriteDto} from '@/helpers/ui/sprite/UiSpriteDto.ts';
+    import type {SpriteFrameDto, UiSpriteDto} from '@/ui/builder/sprite/UiSpriteDto.ts';
     import {computed, ref, watch} from 'vue';
     import {Config} from '@/config.ts';
     import {AnimationStrategy} from 'excalibur';
@@ -70,7 +70,8 @@
 
 <style scoped lang="less">
     .ui-sprite {
-        border: var(--1-pix) solid var(--c-white);
+        border: var(--border-default);
+        border-radius: var(--border-radius);
         background: var(--c-black-faded);
         width: v-bind(width);
         height: v-bind(height);

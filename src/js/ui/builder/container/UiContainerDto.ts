@@ -1,4 +1,4 @@
-import {UiElemDto} from '@/helpers/ui/UiElemDto.ts';
+import {UiElemDto} from '@/ui/builder/UiElemDto.ts';
 import type {EnumValue} from '@/utils/types.ts';
 import type {Reactive} from 'vue';
 

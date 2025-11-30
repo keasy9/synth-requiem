@@ -1,6 +1,6 @@
-import type {AnyUiAnchor} from '@/helpers/ui/UiElemBuilder.ts';
-import {UiAnchor} from '@/helpers/ui/UiElemBuilder.ts';
-import {UiState} from '@/helpers/ui/State.ts';
+import type {AnyUiAnchor} from '@/ui/builder/UiElemBuilder.ts';
+import {UiAnchor} from '@/ui/builder/UiElemBuilder.ts';
+import {UiState} from '@/ui/State.ts';
 
 export abstract class UiElemDto {
     public anchor: AnyUiAnchor = UiAnchor.Center;

@@ -1,9 +1,10 @@
-import {UiElemBuilder} from '@/helpers/ui/UiElemBuilder.ts';
-import {UiTextboxDto} from '@/helpers/ui/textbox/UiTextboxDto.ts';
+import {UiElemBuilder} from '@/ui/builder/UiElemBuilder.ts';
+import {UiTextboxDto} from '@/ui/builder/textbox/UiTextboxDto.ts';
 import {type Reactive, reactive} from 'vue';
 
 export class UiTextboxBuilder extends UiElemBuilder {
     protected _content: string = '';
+    protected _typing: boolean = false;
 
     /**
      * Установить внутренний html.
@@ -33,6 +34,15 @@ export class UiTextboxBuilder extends UiElemBuilder {
     }
 
     /**
+     * Включить или выключить анимацию печати текста.
+     * @param typing
+     */
+    public type(typing: boolean = true): this {
+        this._typing = typing;
+        return this;
+    }
+
+    /**
      * @inheritDoc
      */
     public get(): Reactive<UiTextboxDto> {
@@ -40,6 +50,7 @@ export class UiTextboxBuilder extends UiElemBuilder {
 
         instance.content = this._content;
         instance.anchor = this._anchor;
+        instance.typing = this._typing;
 
         return instance;
     }

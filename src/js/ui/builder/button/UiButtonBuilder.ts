@@ -1,5 +1,5 @@
-import {UiElemBuilder} from '@/helpers/ui/UiElemBuilder.ts';
-import {UiButtonDto} from '@/helpers/ui/button/UiButtonDto.ts';
+import {UiElemBuilder} from '@/ui/builder/UiElemBuilder.ts';
+import {UiButtonDto} from '@/ui/builder/button/UiButtonDto.ts';
 import {type Reactive, reactive} from 'vue';
 
 export class UiButtonBuilder extends UiElemBuilder {

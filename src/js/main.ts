@@ -2,7 +2,7 @@ import {BoundingBox, Engine} from 'excalibur';
 import {Config} from '@/config.ts';
 import {Batches} from '@/resources.ts';
 import {createApp} from 'vue';
-import UiRenderer from '@/components/UiRenderer.vue';
+import UiRenderer from '@/ui/UiRenderer.vue';
 
 class Game extends Engine {
     public get screenBox(): BoundingBox {

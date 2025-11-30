@@ -1,4 +1,4 @@
-import {UiElemDto} from '@/helpers/ui/UiElemDto.ts';
+import {UiElemDto} from '@/ui/builder/UiElemDto.ts';
 import {type Animation, AnimationStrategy, Sprite} from 'excalibur';
 
 export type SpriteFrameDto = {

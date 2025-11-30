@@ -1,6 +1,6 @@
-import {UiElemBuilder} from '@/helpers/ui/UiElemBuilder.ts';
-import {type AnyUiContainerLayout, UiContainerDto, UiContainerLayout} from '@/helpers/ui/container/UiContainerDto.ts';
-import type {UiElemDto} from '@/helpers/ui/UiElemDto.ts';
+import {UiElemBuilder} from '@/ui/builder/UiElemBuilder.ts';
+import {type AnyUiContainerLayout, UiContainerDto, UiContainerLayout} from '@/ui/builder/container/UiContainerDto.ts';
+import type {UiElemDto} from '@/ui/builder/UiElemDto.ts';
 import {type Reactive, reactive} from 'vue';
 
 export class UiContainerBuilder extends UiElemBuilder {
