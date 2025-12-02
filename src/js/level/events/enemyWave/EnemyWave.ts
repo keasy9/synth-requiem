@@ -17,7 +17,6 @@ export class EnemyWave implements OnPreUpdate, TimelineEvent {
 
     protected enemyConfList: NormalizedEnemyConf[] = [];
     protected enemies: Enemy[] = [];
-    protected onScreenEnemies: Enemy[] = [];
     protected deathBounds: BoundingBox;
     protected isStarted: boolean = false;
 
@@ -74,6 +73,6 @@ export class EnemyWave implements OnPreUpdate, TimelineEvent {
     }
 
     public blockTimeline(): boolean {
-        return false;
+        return !!this.enemies.find(e => !e.wasShown);
     }
 }

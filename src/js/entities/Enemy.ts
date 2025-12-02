@@ -100,6 +100,8 @@ export class Enemy extends Actor implements DamageTaker, DamageProvider {
     protected health: number = 10;
     protected _damage: number = 10;
 
+    protected _wasShown: boolean = false;
+
     constructor(type: AnyEnemyType = EnemyType.White) {
         super({ collisionGroup: CollisionGroups.Enemy });
         this.type = type;
@@ -129,6 +131,10 @@ export class Enemy extends Actor implements DamageTaker, DamageProvider {
     public onInitialize(_engine: Engine): void {
         this.makeSpriteFromType();
         this.makeColliderFromType();
+    }
+
+    onPreUpdate(_engine: Engine, _elapsed: number) {
+        if (!this._wasShown) this._wasShown = !this.isOffScreen;
     }
 
     public setType(type: AnyEnemyType): this {
@@ -169,5 +175,10 @@ export class Enemy extends Actor implements DamageTaker, DamageProvider {
     protected explode() {
         this.kill();
         Explosion.explode(ExplosionType.Orange, this.pos);
+    }
+
+    // показался ли враг на экране
+    public get wasShown(): boolean {
+        return this._wasShown;
     }
 }
