@@ -1,5 +1,5 @@
 import {type Engine, Resource, Scene, TransformComponent, vec} from 'excalibur';
-import {ParallaxBackground} from '@/entities/ParallaxBackground.ts';
+import {ParallaxBackground, type ParallaxBackgroundConf} from '@/entities/ParallaxBackground.ts';
 import {Batches} from '@/resources.ts';
 import {Player} from '@/entities/Player.ts';
 import {Config} from '@/config.ts';
@@ -10,6 +10,7 @@ import type {Default} from '@/loaders/Default.ts';
 type LevelConfig = {
     id: string,
     timeline: TimelineEventConf[],
+    background?: ParallaxBackgroundConf,
 }
 
 class Level extends Scene {
@@ -42,6 +43,8 @@ class Level extends Scene {
         this.bounds.get(TransformComponent).z = 100;
 
         this.player.pos = vec(Config.width / 2, Config.height * .9);
+
+        this.bg.setConf(this.levelData.data.background ?? {});
 
         this.add(this.bg);
         this.add(this.bounds);

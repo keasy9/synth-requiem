@@ -1,50 +1,32 @@
 {
     "id": 1,
-    "timeline": [
-        {
-            "type": "dialog",
-            "conf": {
-                "startMonolog": 0,
-                "monologues": [
-                    {
-                        "npc": "glorp",
-                        "name": "Glorp",
-                        "text": "nky zoogle, zeekybooble beeble meep forp bogos binted?",
-                        "time": 2500,
-                        "answers": [
-                            {
-                                "text": "vrop?",
-                                "nextMonolog": 2
-                            },
-                            {
-                                "text": "Photos printed?",
-                                "nextMonolog": 1
-                            }
-                        ]
-                    },
-                    {
-                        "npc": "general",
-                        "name": "Human",
-                        "text": "yes",
-                        "answers": [
-                            {
-                                "text": "ok"
-                            }
-                        ]
-                    },
-                    {
-                        "npc": "glorp",
-                        "name": "Glorp",
-                        "text": "bogos binted",
-                        "answers": [
-                            {
-                                "text": "zob"
-                            }
-                        ]
-                    }
-                ]
+    "background": {
+        "layers": {
+            "dust": {
+                "variant": "less",
+                "color": "#1e1e41",
+                "opacity": 0.5
+            },
+            "stars": {
+                "variant": "more",
+                "color": "#004477"
             }
         },
+        "planets": [
+            {
+                "type": "tiny",
+                "at": [0.9, 0.6],
+                "color": "#00eeff"
+            },
+            {
+                "type": "medium",
+                "at": [0, 0.1],
+                "color": "#210055"
+            }
+        ]
+    },
+    "timeline": [
+
         {
             "type": "wave",
             "delay": 500,

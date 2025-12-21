@@ -298,6 +298,13 @@ class SpriteBuilder {
     }
 
     /**
+     * Создать массив кадров.
+     */
+    public sprites(): Sprite[] {
+        return this.sheet().sprites;
+    }
+
+    /**
      * Создать анимацию. Если кадры не указаны, будут использованы все кадры
      */
     public anim(type: AnimationStrategy = AnimationStrategy.Freeze, frameDuration: number = 100): Animation {
@@ -347,7 +354,7 @@ class SpriteBuilder {
         this.computeSizesIfNeeded();
 
         if (from === undefined) {
-            to = this._to ?? (this._cols! - 1);
+            to = this._to ?? (this._cols! - 1) + (this._cols! * ((this._rows ?? 1) - 1));
             from = this._from ?? 0;
         } else if (to === undefined) {
             to = from;

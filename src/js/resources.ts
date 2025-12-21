@@ -4,7 +4,10 @@ import {Default} from '@/loaders/Default.ts';
 import {BitmapFontSource} from '@/loadables/BitmapFontSource.ts';
 
 export const Resources = {
-    SpriteBackground: new ImageSource('./assets/sprites/space.png'),
+    SpriteSpace: new ImageSource('./assets/sprites/space.png'),
+    SpritePlanets: new ImageSource('./assets/sprites/planets.png'),
+
+    // todo rescale
     SpritePlayers: new ImageSource('./assets/sprites/players.png'),
     SpriteExhausts: new ImageSource('./assets/sprites/exhaust.png'),
     SpriteEnemies: new ImageSource('./assets/sprites/enemies.png'),
@@ -17,12 +20,13 @@ export const Resources = {
 // ресурсы которые нужны сразу после старта игры или на протяжении всей игры
 const mainBatch = new Intro();
 mainBatch.addResources([
-    Resources.SpriteBackground,
 ]);
 
 // ресурсы, которые нужны для игровых уровней
 const levelBatch = new Default();
 levelBatch.addResources([
+    Resources.SpriteSpace,
+    Resources.SpritePlanets,
     Resources.SpritePlayers,
     Resources.SpriteExhausts,
     Resources.SpriteEnemies,

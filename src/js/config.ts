@@ -1,8 +1,8 @@
 import {Color, DisplayMode, ImageFiltering} from 'excalibur';
 import {level} from '@/scenes/Level.ts';
 
-const width = 128;
-const height = 256;
+const width = 256;
+const height = 512;
 
 const canvasElem = document.getElementById('canvas');
 if (!canvasElem || !(canvasElem instanceof HTMLCanvasElement)) throw new Error('Canvas не найден!');
