@@ -215,9 +215,9 @@ export class ParallaxBackground extends Entity<TransformComponent> {
         const planetSprites = sprite(Resources.SpritePlanets)
             .frames( // todo json?
                 {x: 0, y: 0, width: 136, height: 136},
-                {x: 136, y: 0, width: 82, height: 82},
-                {x: 218, y: 0, width: 70, height: 70},
-                {x: 136, y: 82, width: 54, height: 54},
+                {x: 135, y: 0, width: 82, height: 82},
+                {x: 217, y: 0, width: 70, height: 70},
+                {x: 135, y: 82, width: 54, height: 54},
             ).sprites();
 
         const planetSpritesMap = {
