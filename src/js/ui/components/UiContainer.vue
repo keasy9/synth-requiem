@@ -5,48 +5,43 @@
             [`ui-container--${dto.layout}`]: dto.layout,
             'ui-container--gap': dto.gap,
         }"
+        :style="elStyle"
     >
         <component
             class="ui-container__elem"
             v-for="elem in dto.children"
             :key="elem.id"
             :class="{ [getComponentClass(elem)]: true }"
-            :is="getComponentType(elem)"
+            :style="computeElementStyles(elem)"
+            :is="matchDtoComponent(elem)"
             :dto="elem"
         />
     </div>
 </template>
 
 <script setup lang="ts">
-    import {UiContainerDto} from '@/ui/dto/UiContainerDto.ts';
-    import {type Component, computed} from 'vue';
+    import {UiContainerDto, UiContainerLayout} from '@/ui/dto/UiContainerDto.ts';
+    import {computed, type Reactive} from 'vue';
     import type {UiElemDto} from '@/ui/dto/UiElemDto.ts';
     import {UiBarDto} from '@/ui/dto/UiBarDto.ts';
-    import UiBar from '@/ui/components/UiBar.vue';
     import {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
-    import UiButton from '@/ui/components/UiButton.vue';
     import {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
-    import UiTextbox from '@/ui/components/UiTextbox.vue';
-    import UiContainer from '@/ui/components/UiContainer.vue';
     import {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
-    import UiSprite from '@/ui/components/UiSprite.vue';
-    import {Config} from '@/config.ts';
+    import {matchDtoComponent} from '@/ui/helpers/matchDtoComponent.ts';
+    import {computeElementStyles} from '@/ui/helpers/computeElementStyles.ts';
 
     const props = defineProps<{ dto: UiContainerDto }>();
 
-    const gap = computed(() => props.dto.gap * Config.pixelRatio + 'px');
+    const elStyle = computed(() => {
+        switch (props.dto.layout) {
+            case UiContainerLayout.Rows:
+                return { 'grid-auto-rows': props.dto.children.map(el => el.growing ? '1fr' : 'auto').join(' ') };
+            case UiContainerLayout.Cols:
+                return { 'grid-auto-columns': props.dto.children.map(el => el.growing ? '1fr' : 'auto').join(' ') };
+        }
+    });
 
-    function getComponentType(elem: UiElemDto): Component|undefined {
-        if (elem instanceof UiBarDto) return UiBar;
-        else if (elem instanceof UiButtonDto) return UiButton;
-        else if (elem instanceof UiContainerDto) return UiContainer;
-        else if (elem instanceof UiTextboxDto) return UiTextbox;
-        else if (elem instanceof UiSpriteDto) return UiSprite;
-
-        return undefined
-    }
-
-    function getComponentClass(elem: UiElemDto): string {
+    function getComponentClass(elem: UiElemDto|Reactive<UiElemDto>): string {
         if (elem instanceof UiBarDto) return 'ui-container__elem--bar';
         else if (elem instanceof UiButtonDto) return 'ui-container__elem--button';
         else if (elem instanceof UiContainerDto) return 'ui-container__elem--container';
@@ -59,19 +54,11 @@
 
 <style lang="less">
     .ui-container {
+        display: grid;
+
         &--cols {
-            display: flex;
+            grid-auto-flow: column;
 
-            .ui-container {
-                &__elem {
-                    flex-grow: 1;
-
-                    &--container,
-                    &--sprite {
-                        flex-grow: 0;
-                    }
-                }
-            }
 
             &:not(.ui-container--gap) {
                 & > .ui-container__elem {
@@ -87,8 +74,7 @@
         }
 
         &--rows {
-            display: flex;
-            flex-direction: column;
+            grid-auto-flow: row;
 
             .ui-container:not(.ui-container--gap) {
                 .ui-container {
@@ -100,11 +86,5 @@
                 }
             }
         }
-    }
-</style>
-
-<style scoped lang="less">
-    .ui-container {
-        gap: v-bind(gap);
     }
 </style>

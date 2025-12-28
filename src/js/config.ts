@@ -9,7 +9,7 @@ if (!canvasElem || !(canvasElem instanceof HTMLCanvasElement)) throw new Error('
 
 const scale = Math.ceil(
     Math.max(canvasElem.offsetWidth / width, canvasElem.offsetHeight / height)
-) * Math.max(2, window.devicePixelRatio); // минимум 2 для плавного движения
+);
 
 export const Config = {
     width: width,
@@ -18,7 +18,8 @@ export const Config = {
     pixelArt: true,
     antialiasing: false,
     filtering: ImageFiltering.Pixel,
-    pixelRatio: scale,
+    pixelRatio: scale * Math.max(2, window.devicePixelRatio),  // минимум 2 для плавного движения
+    baseScale: scale, // кастомное свойство для UI элементов
     backgroundColor: Color.Black,
     canvasElement: canvasElem,
     fixedUpdateFps: 30,

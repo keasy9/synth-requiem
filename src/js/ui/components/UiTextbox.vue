@@ -5,7 +5,7 @@
 <script setup lang="ts">
     import type {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
     import {computed, watch} from 'vue';
-    import {useTyping} from '@/ui/helpers/use-typing.ts';
+    import {useTyping} from '@/ui/helpers/useTyping.ts';
 
     const props = defineProps<{ dto: UiTextboxDto }>();
 

@@ -8,7 +8,8 @@
                 [`ui__elem--${elem.anchor}`]: elem.anchor,
                 [getComponentClass(elem)]: true
             }"
-            :is="getComponentType(elem)"
+            :style="computeElementStyles(elem)"
+            :is="matchDtoComponent(elem)"
             :dto="elem"
         />
     </div>
@@ -18,31 +19,18 @@
     import {UiState} from '@/ui/State.ts';
     import type {UiElemDto} from '@/ui/dto/UiElemDto.ts';
     import {UiBarDto} from '@/ui/dto/UiBarDto.ts';
-    import UiBar from '@/ui/components/UiBar.vue';
     import {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
     import {UiContainerDto} from '@/ui/dto/UiContainerDto.ts';
-    import UiContainer from '@/ui/components/UiContainer.vue';
-    import UiButton from '@/ui/components/UiButton.vue';
     import {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
-    import UiTextbox from '@/ui/components/UiTextbox.vue';
-    import {type Component, nextTick, ref, useTemplateRef, watch} from 'vue';
+    import {nextTick, type Reactive, ref, useTemplateRef, watch} from 'vue';
     import {Config} from '@/config.ts';
-    import UiSprite from '@/ui/components/UiSprite.vue';
     import {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
+    import {matchDtoComponent} from '@/ui/helpers/matchDtoComponent.ts';
+    import {computeElementStyles} from '@/ui/helpers/computeElementStyles.ts';
 
     const root = useTemplateRef('root');
 
-    function getComponentType(elem: UiElemDto): Component|undefined {
-        if (elem instanceof UiBarDto) return UiBar;
-        else if (elem instanceof UiButtonDto) return UiButton;
-        else if (elem instanceof UiContainerDto) return UiContainer;
-        else if (elem instanceof UiTextboxDto) return UiTextbox;
-        else if (elem instanceof UiSpriteDto) return UiSprite;
-
-        return undefined
-    }
-
-    function getComponentClass(elem: UiElemDto): string {
+    function getComponentClass(elem: UiElemDto|Reactive<UiElemDto>): string {
         if (elem instanceof UiBarDto) return 'ui__elem--bar';
         else if (elem instanceof UiButtonDto) return 'ui__elem--button';
         else if (elem instanceof UiContainerDto) return 'ui__elem--container';
@@ -93,6 +81,7 @@
             width: fit-content;
             height: fit-content;
             pointer-events: auto;
+            box-sizing: border-box;
 
             &--center {
                 top: 0;

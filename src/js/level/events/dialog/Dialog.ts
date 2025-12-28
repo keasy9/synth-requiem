@@ -89,20 +89,20 @@ export class Dialog implements TimelineEvent {
         this.rootContainer ??= ui()
             .box()
             .at(UiAnchor.Bottom)
-            .setGap(2)
+            .withGap(4)
+            .withPadding(10)
             .asCols()
             .with(
                 this.npcPortrait!,
                 ui()
                     .box()
-                    .asCols()
+                    .asRows()
+                    .grow()
                     .with(
-                        ui().box().asRows().with(
-                            this.name!,
-                        ),
+                        this.name!,
                         this.textbox!,
+                        this.buttonsContainer!,
                     ),
-                this.buttonsContainer!,
             ).reactive();
 
         this.rootContainer.show();
@@ -119,8 +119,14 @@ export class Dialog implements TimelineEvent {
             .autoWidth(1)
             .one();
 
-        if (!this.npcPortrait) this.npcPortrait = ui().sprite(Dialog.npcPortraits[npc]).reactive();
-        else this.npcPortrait.framesFrom(Dialog.npcPortraits[npc]!);
+        if (!this.npcPortrait) {
+            this.npcPortrait = ui()
+                .sprite(Dialog.npcPortraits[npc])
+                .scaleBy(1.5) // для лучшего визуала
+                .reactive();
+        } else {
+            this.npcPortrait.framesFrom(Dialog.npcPortraits[npc]!);
+        }
     }
 
     protected setName(name: string): void {
@@ -129,7 +135,7 @@ export class Dialog implements TimelineEvent {
     }
 
     protected setAnswers(answers: MonologAnswer[]): void {
-        this.buttonsContainer ??= ui().box().setGap(1).reactive();
+        this.buttonsContainer ??= ui().box().withGap(1).reactive();
 
         this.buttonsContainer.children = answers.map(answer => {
             const btn = ui().button().html(answer.text);

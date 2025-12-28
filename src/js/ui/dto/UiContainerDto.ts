@@ -14,8 +14,6 @@ export class UiContainerDto extends UiElemDto {
     public children: Reactive<UiElemDto>[] = [];
     public layout: AnyUiContainerLayout = UiContainerLayout.Rows;
     public gap: number = 0;
-    public margin: number = 0;
-    public padding: number = 0;
 
     /**
      * Расположить элементы контейнера строками.
@@ -54,7 +52,7 @@ export class UiContainerDto extends UiElemDto {
      * Установить отступ между элементами контейнера.
      * @param gap
      */
-    public setGap(gap: number): this {
+    public withGap(gap: number): this {
         this.gap = gap;
         return this;
     }

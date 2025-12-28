@@ -12,7 +12,7 @@
 
     const props = defineProps<{ dto: UiSpriteDto }>();
 
-    const scale = computed(() => Config.pixelRatio * props.dto.scale);
+    const scale = computed(() => Config.baseScale * props.dto.scale);
     const width = computed(() => props.dto.width * scale.value + 'px');
     const height = computed(() => props.dto.height * scale.value + 'px');
 
@@ -68,22 +68,27 @@
     }, {immediate: true});
 </script>
 
-<style scoped lang="less">
+<style lang="less">
     .ui-sprite {
-        border: var(--border-default);
-        border-radius: var(--border-radius);
-        background: var(--c-black-faded);
-        width: v-bind(width);
-        height: v-bind(height);
         overflow: hidden;
 
         &__img {
             width: 100%;
+            object-fit: none;
+            transform-origin: top left;
+        }
+    }
+</style>
+
+<style scoped lang="less">
+    .ui-sprite {
+        width: v-bind(width);
+        height: v-bind(height);
+
+        &__img {
             aspect-ratio: v-bind(frameRatio);
             object-position: v-bind(frameX) v-bind(frameY);
             scale: v-bind(scale);
-            object-fit: none;
-            transform-origin: top left;
         }
     }
 </style>

@@ -80,7 +80,7 @@ export class UiSpriteDto extends UiElemDto {
      * Установить кадры.
      * @param frames
      */
-    public setFrames(...frames: SpriteFrameDto[]): this {
+    public withFrames(...frames: SpriteFrameDto[]): this {
         this.frames = frames;
         return this;
     }
@@ -98,7 +98,7 @@ export class UiSpriteDto extends UiElemDto {
      * Установить масштаб.
      * @param scale
      */
-    public setScale(scale: number): this {
+    public scaleBy(scale: number): this {
         this.scale = scale;
         return this;
     }
