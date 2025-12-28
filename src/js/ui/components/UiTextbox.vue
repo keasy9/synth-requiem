@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-    import type {UiTextboxDto} from '@/ui/builder/textbox/UiTextboxDto.ts';
+    import type {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
     import {computed, watch} from 'vue';
     import {useTyping} from '@/ui/helpers/use-typing.ts';
 

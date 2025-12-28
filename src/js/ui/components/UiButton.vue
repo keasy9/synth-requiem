@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-    import type {UiButtonDto} from '@/ui/builder/button/UiButtonDto.ts';
+    import type {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
 
     const props = defineProps<{ dto: UiButtonDto }>();
 

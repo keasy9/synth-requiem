@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-    import type {SpriteFrameDto, UiSpriteDto} from '@/ui/builder/sprite/UiSpriteDto.ts';
+    import type {SpriteFrameDto, UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
     import {computed, ref, watch} from 'vue';
     import {Config} from '@/config.ts';
     import {AnimationStrategy} from 'excalibur';

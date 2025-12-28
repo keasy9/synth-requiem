@@ -6,6 +6,7 @@ import {BitmapFontSource} from '@/loadables/BitmapFontSource.ts';
 export const Resources = {
     SpriteSpace: new ImageSource('./assets/sprites/space.png'),
     SpritePlanets: new ImageSource('./assets/sprites/planets.png'),
+    SpriteCharacter: new ImageSource('./assets/sprites/character.png'),
 
     // todo rescale
     SpritePlayers: new ImageSource('./assets/sprites/players.png'),
@@ -13,7 +14,6 @@ export const Resources = {
     SpriteEnemies: new ImageSource('./assets/sprites/enemies.png'),
     SpriteBullets: new ImageSource('./assets/sprites/bullets.png'),
     SpriteExplosions: new ImageSource('./assets/sprites/explosions.png'),
-    SpriteCharacters: new ImageSource('./assets/sprites/characters.png'),
     TinyNumbersFont: new BitmapFontSource('./assets/sprites/fonts/tinynumbers.fnt'),
 } as const;
 
@@ -33,7 +33,7 @@ levelBatch.addResources([
     Resources.SpriteBullets,
     Resources.SpriteExplosions,
     Resources.TinyNumbersFont,
-    Resources.SpriteCharacters,
+    Resources.SpriteCharacter,
 ]);
 
 export const Batches = {

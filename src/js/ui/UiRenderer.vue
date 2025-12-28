@@ -16,19 +16,19 @@
 
 <script setup lang="ts">
     import {UiState} from '@/ui/State.ts';
-    import type {UiElemDto} from '@/ui/builder/UiElemDto.ts';
-    import {UiBarDto} from '@/ui/builder/bar/UiBarDto.ts';
-    import UiBar from '@/ui/elements/UiBar.vue';
-    import {UiButtonDto} from '@/ui/builder/button/UiButtonDto.ts';
-    import {UiContainerDto} from '@/ui/builder/container/UiContainerDto.ts';
-    import UiContainer from '@/ui/elements/UiContainer.vue';
-    import UiButton from '@/ui/elements/UiButton.vue';
-    import {UiTextboxDto} from '@/ui/builder/textbox/UiTextboxDto.ts';
-    import UiTextbox from '@/ui/elements/UiTextbox.vue';
+    import type {UiElemDto} from '@/ui/dto/UiElemDto.ts';
+    import {UiBarDto} from '@/ui/dto/UiBarDto.ts';
+    import UiBar from '@/ui/components/UiBar.vue';
+    import {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
+    import {UiContainerDto} from '@/ui/dto/UiContainerDto.ts';
+    import UiContainer from '@/ui/components/UiContainer.vue';
+    import UiButton from '@/ui/components/UiButton.vue';
+    import {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
+    import UiTextbox from '@/ui/components/UiTextbox.vue';
     import {type Component, nextTick, ref, useTemplateRef, watch} from 'vue';
     import {Config} from '@/config.ts';
-    import UiSprite from '@/ui/elements/UiSprite.vue';
-    import {UiSpriteDto} from '@/ui/builder/sprite/UiSpriteDto.ts';
+    import UiSprite from '@/ui/components/UiSprite.vue';
+    import {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
 
     const root = useTemplateRef('root');
 
