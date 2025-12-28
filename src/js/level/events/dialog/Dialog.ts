@@ -2,7 +2,7 @@ import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
 import {type Engine, type Sprite} from 'excalibur';
 import {EventBus, Events} from '@/helpers/events/EventBus.ts';
 import type {UiContainerDto} from '@/ui/dto/UiContainerDto.ts';
-import {ui} from '@/ui/Ui.ts';
+import {ui, UiColor} from '@/ui/Ui.ts';
 import type {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
 import type {UiBarDto} from '@/ui/dto/UiBarDto.ts';
 import {UiAnchor} from '@/ui/dto/UiElemDto.ts';
@@ -98,6 +98,7 @@ export class Dialog implements TimelineEvent {
                     .box()
                     .asRows()
                     .grow()
+                    .withPadding(19, 0, 0, 0)
                     .with(
                         this.name!,
                         this.textbox!,
@@ -109,8 +110,18 @@ export class Dialog implements TimelineEvent {
     }
 
     protected setText(text: string): void {
-        if (!this.textbox) this.textbox = ui().text(text).type().reactive();
-        else this.textbox.content = text;
+        if (!this.textbox) {
+            this.textbox = ui().text(text)
+                .grow()
+                .type()
+                .withMargin(0, 0, 10, -40)
+                .withPadding(3, 3, 3, 40)
+                .border(1, 0, 0, 0, UiColor.Accent)
+                .reactive();
+
+        } else {
+            this.textbox.content = text;
+        }
     }
 
     protected setNpc(npc: AnyNpcPortrait): void {
@@ -130,12 +141,21 @@ export class Dialog implements TimelineEvent {
     }
 
     protected setName(name: string): void {
-        if (!this.name) this.name = ui().text(name).reactive();
-        else this.name.content = name;
+        if (!this.name) {
+            this.name = ui()
+                .text(name)
+                .withMargin(0, 0, 0, -40)
+                .withPadding(3, 8, 6, 40)
+                .border(1, 0, 0, 0, UiColor.Accent)
+                .reactive();
+
+        } else {
+            this.name.content = name;
+        }
     }
 
     protected setAnswers(answers: MonologAnswer[]): void {
-        this.buttonsContainer ??= ui().box().withGap(1).reactive();
+        this.buttonsContainer ??= ui().box().withGap(3).reactive();
 
         this.buttonsContainer.children = answers.map(answer => {
             const btn = ui().button().html(answer.text);

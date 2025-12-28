@@ -23,10 +23,6 @@
 
 <style lang="less">
     .ui-textbox {
-        border: var(--border-default);
-        border-radius: var(--border-radius);
-        padding: var(--1-pix);
-        background: var(--c-black-faded);
         color: var(--c-white);
     }
 </style>

@@ -40,7 +40,7 @@
         return '';
     }
 
-    const pixelRatio = ref(Config.pixelRatio);
+    const pixelRatio = ref(Config.baseScale);
 
     watch(UiState, () => {
         nextTick(() => {
@@ -58,10 +58,14 @@
         --c-white: #ffffff;
         --c-gray: #818793;
         --c-black-faded: #000000b2;
+        --c-accent: #4a00e0;
 
         --border-width: calc(var(--1-pix) / 2);
         --border-radius: 0;
         --border-default: var(--border-width) solid var(--c-white);
+
+        --trans-time: .3s;
+        --trans-ease: ease;
 
         position: absolute;
         top: 0;

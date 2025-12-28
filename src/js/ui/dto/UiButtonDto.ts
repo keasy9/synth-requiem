@@ -3,6 +3,7 @@ import {UiElemDto} from '@/ui/dto/UiElemDto.ts';
 export class UiButtonDto extends UiElemDto {
     public content: string = '';
     public onclick?: Function;
+    public padding: [number, number, number, number] = [1, 1, 1, 1];
 
     /**
      * Установить внутренний html.

@@ -19,7 +19,7 @@ export const Config = {
     antialiasing: false,
     filtering: ImageFiltering.Pixel,
     pixelRatio: scale * Math.max(2, window.devicePixelRatio),  // минимум 2 для плавного движения
-    baseScale: scale, // кастомное свойство для UI элементов
+    baseScale: scale * window.devicePixelRatio, // кастомное свойство для UI элементов
     backgroundColor: Color.Black,
     canvasElement: canvasElem,
     fixedUpdateFps: 30,

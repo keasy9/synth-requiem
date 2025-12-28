@@ -1,6 +1,7 @@
 import {getElemId, UiState} from '@/ui/State.ts';
 import {reactive, type Reactive} from 'vue';
 import type {EnumValue} from '@/utils/types.ts';
+import {Color} from 'excalibur';
 
 export const UiAnchor = {
     Center: 'center', // по центру экрана
@@ -16,6 +17,8 @@ export abstract class UiElemDto {
     public growing: boolean = false;
     public padding: [number, number, number, number] = [0, 0, 0, 0];
     public margin: [number, number, number, number] = [0, 0, 0, 0];
+    public borderWidth: [number, number, number, number] = [0, 0, 0, 0];
+    public borderColor?: Color;
 
     public constructor() {
         this._id = getElemId();
@@ -63,7 +66,7 @@ export abstract class UiElemDto {
     }
 
     /**
-     * Установить внутренние отступы контейнера.
+     * Установить внутренние отступы элемента.
      * @param padding
      */
     public withPadding(...padding: [number]): this;
@@ -79,8 +82,8 @@ export abstract class UiElemDto {
     }
 
     /**
-     * Установить внутренние отступы контейнера.
-     * @param padding
+     * Установить внешние отступы элемента.
+     * @param margin
      */
     public withMargin(...margin: [number]): this;
     public withMargin(...margin: [number, number]): this;
@@ -93,6 +96,40 @@ export abstract class UiElemDto {
         this.margin = margin as [number, number, number, number];
         return this;
     }
+
+    /**
+     * Установить рамки элемента.
+     * @param border
+     * @param color
+     */
+    public border(border: number, color?: Color): this;
+    public border(borderY: number, borderX: number, color?: Color): this;
+    public border(borderTop: number, borderRight: number, borderBottom: number, borderLeft: number, color?: Color): this;
+    public border(borderTop: number, borderRight?: number|Color, borderBottom?: number|Color, borderLeft?: number, color?: Color): this {
+        if (borderRight instanceof Color) {
+            color = borderRight;
+            borderRight = undefined;
+
+        } else if (borderBottom instanceof Color) {
+            color = borderBottom;
+            borderBottom = undefined;
+        }
+
+        if (color) this.borderColor = color;
+
+        // noinspection JSSuspiciousNameCombination
+        borderRight ??= borderTop;
+
+        this.borderWidth = [
+            borderTop,
+            borderRight,
+            (borderBottom as number) ?? borderTop,
+            borderLeft ?? borderRight,
+        ];
+
+        return this;
+    }
+
 
     /**
      * Получить реактивную ссылку на элемент.

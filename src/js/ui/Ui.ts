@@ -1,5 +1,5 @@
 import type {UiElemDto} from '@/ui/dto/UiElemDto.ts';
-import type {Animation, Sprite} from 'excalibur';
+import {type Animation, Color, type Sprite} from 'excalibur';
 import {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
 import {UiContainerDto} from '@/ui/dto/UiContainerDto.ts';
 import {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
@@ -15,3 +15,8 @@ export function ui() {
         sprite: (source?: Animation|Sprite) => UiSpriteDto.make(source),
     };
 }
+
+
+export const UiColor = {
+    Accent: Color.fromHex('#4a00e0'),
+} as const;

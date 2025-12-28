@@ -2,6 +2,7 @@ import type {UiElemDto} from '@/ui/dto/UiElemDto.ts';
 import {type Reactive} from 'vue';
 import {UiContainerDto, UiContainerLayout} from '@/ui/dto/UiContainerDto.ts';
 import {Config} from '@/config.ts';
+import {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
 
 export function computeElementStyles(elem: UiElemDto|Reactive<UiElemDto>): Record<string, string> {
     const styles: Record<string, string> = {};
@@ -17,11 +18,17 @@ export function computeElementStyles(elem: UiElemDto|Reactive<UiElemDto>): Recor
         }
 
         styles['gap'] = elem.gap * Config.baseScale + 'px';
+
+    } else if (elem instanceof UiTextboxDto) {
+        if (!elem.growing) styles['width'] = 'fit-content';
+
+        styles['border-width'] = elem.borderWidth.map(p => p * Config.baseScale + 'px').join(' ');
+        styles['border-color'] = elem.borderColor?.toHex() ?? 'transparent';
+        styles['border-style'] = 'solid';
     }
 
     styles['padding'] = elem.padding.map(p => p * Config.baseScale + 'px').join(' ');
     styles['margin'] = elem.margin.map(p => p * Config.baseScale + 'px').join(' ');
-
 
     return styles;
 }
