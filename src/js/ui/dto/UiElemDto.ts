@@ -19,6 +19,7 @@ export abstract class UiElemDto {
     public margin: [number, number, number, number] = [0, 0, 0, 0];
     public borderWidth: [number, number, number, number] = [0, 0, 0, 0];
     public borderColor?: Color;
+    public visible?: boolean = true;
 
     public constructor() {
         this._id = getElemId();
@@ -32,17 +33,17 @@ export abstract class UiElemDto {
     }
 
     /**
-     * Вывести элемент на экран.
+     * Вывести элемент на экран, добавив его в корневой контейнер.
      */
-    public show(): this {
+    public addToRoot(): this {
         UiState[this._id] = this.reactive();
         return this;
     }
 
     /**
-     * Скрыть элемент.
+     * Удалить элемент с экрана, если он находится в корневом контейнере.
      */
-    public hide(): this {
+    public removeFromRoot(): this {
         delete UiState[this._id];
         return this;
     }
@@ -136,5 +137,21 @@ export abstract class UiElemDto {
      */
     public reactive(): Reactive<this> {
         return reactive(this);
+    }
+
+    /**
+     * Временно скрыть элемент. Для скрытия на постоянной основе рекомендуется убрать элемент из родительского контейнера.
+     */
+    public hide(): this {
+        this.visible = false;
+        return this;
+    }
+
+    /**
+     * Показать элемент.
+     */
+    public show(): this {
+        this.visible = true;
+        return this;
     }
 }

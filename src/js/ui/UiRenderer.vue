@@ -58,7 +58,7 @@
         --c-white: #ffffff;
         --c-gray: #818793;
         --c-black-faded: #000000b2;
-        --c-accent: #4a00e0;
+        --c-primary: #4a00e0;
 
         --border-width: calc(var(--1-pix) / 2);
         --border-radius: 0;

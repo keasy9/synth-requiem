@@ -1,5 +1,5 @@
 import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
-import {type Engine, type Sprite} from 'excalibur';
+import {type Engine, type Sprite, Timer} from 'excalibur';
 import {EventBus, Events} from '@/helpers/events/EventBus.ts';
 import type {UiContainerDto} from '@/ui/dto/UiContainerDto.ts';
 import {ui, UiColor} from '@/ui/Ui.ts';
@@ -11,6 +11,7 @@ import type {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import type {Reactive} from 'vue';
+import {GAME} from '@/main.ts';
 
 const NpcPortrait = {
     Test: 'test',
@@ -26,7 +27,7 @@ type MonologAnswer = {
 export type MonologConf = {
     npc: AnyNpcPortrait,
     name: string,
-    text: string, // todo локализация, и цветные вставки как в katana zero
+    text: string, // todo локализация и цветные вставки как в katana zero
     answers?: MonologAnswer[],
     nextMonolog?: number, // индекс в monologues родительского диалога
     time?: number,
@@ -51,6 +52,8 @@ export class Dialog implements TimelineEvent {
     protected bar?: Reactive<UiBarDto>;
     protected npcPortrait?: Reactive<UiSpriteDto>;
 
+    protected barTimer?: Timer;
+
     public static create(conf: DialogConf): Dialog {
         return new Dialog(conf);
     }
@@ -68,7 +71,9 @@ export class Dialog implements TimelineEvent {
     }
 
     public onPreUpdate(_engine: Engine, _elapsed: number): void {
-        //
+        if (this.barTimer && this.bar) {
+            this.bar?.setProgress(this.barTimer.timeToNextAction / this.barTimer.interval * 100);
+        }
     }
 
     public start(): this {
@@ -85,6 +90,7 @@ export class Dialog implements TimelineEvent {
         this.setNpc(conf.npc);
         this.setName(conf.name);
         this.setAnswers(conf.answers ?? []);
+        this.resetBar(conf.time);
 
         this.rootContainer ??= ui()
             .box()
@@ -101,22 +107,25 @@ export class Dialog implements TimelineEvent {
                     .withPadding(19, 0, 0, 0)
                     .with(
                         this.name!,
+                        this.bar!,
                         this.textbox!,
                         this.buttonsContainer!,
                     ),
-            ).reactive();
+            )
+            .reactive();
 
-        this.rootContainer.show();
+        this.rootContainer.addToRoot();
     }
 
     protected setText(text: string): void {
+        // todo перетащить функционал анимации появления текста сюда из vue, и сделать чтобы таймер запускался только после полного появления текста
         if (!this.textbox) {
             this.textbox = ui().text(text)
                 .grow()
                 .type()
                 .withMargin(0, 0, 10, -40)
                 .withPadding(3, 3, 3, 40)
-                .border(1, 0, 0, 0, UiColor.Accent)
+                .border(1, 0, 0, 0, UiColor.Primary)
                 .reactive();
 
         } else {
@@ -146,7 +155,7 @@ export class Dialog implements TimelineEvent {
                 .text(name)
                 .withMargin(0, 0, 0, -40)
                 .withPadding(3, 8, 6, 40)
-                .border(1, 0, 0, 0, UiColor.Accent)
+                .border(1, 0, 0, 0, UiColor.Primary)
                 .reactive();
 
         } else {
@@ -169,6 +178,31 @@ export class Dialog implements TimelineEvent {
 
             return btn.reactive();
         });
+    }
+
+    protected resetBar(time?: number): void {
+        if (time) {
+            if (!this.bar) {
+                this.bar = ui().bar()
+                    .paintAt(20, UiColor.Danger)
+                    .withMargin(0, 0, 0, -40)
+                    .reactive();
+            } else {
+                this.bar.setProgress(100);
+            }
+
+            if (!this.barTimer) {
+                this.barTimer = new Timer({interval: time});
+                GAME.add(this.barTimer);
+            } else {
+                this.barTimer.reset(time);
+            }
+
+            this.barTimer.start();
+
+        } else {
+            this.bar?.hide();
+        }
     }
 
     protected end(): void {

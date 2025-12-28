@@ -4,17 +4,23 @@
         @click="onClick"
         @mouseenter="$el.focus()"
     >
-        <span
-            class="ui-button__content"
-            v-html="dto.content"
-        />
+        <span class="ui-button__content">
+            <span
+                class="ui-button__html"
+                v-html="dto.content"
+            />
+        </span>
     </button>
 </template>
 
 <script setup lang="ts">
     import type {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
+    import {computed} from 'vue';
+    import {Config} from '@/config.ts';
 
     const props = defineProps<{ dto: UiButtonDto }>();
+
+    const padding = computed(() => props.dto.padding.map(p => p * Config.baseScale + 'px').join(' '))
 
     function onClick() {
         if (props.dto.onclick)  props.dto.onclick();
@@ -27,6 +33,7 @@
         --b-i-width: calc(var(--b-i-slice) * var(--1-pix));
         --b-i-offset: 2;
 
+        padding: 0;
         position: relative;
         background: none;
         color: var(--c-white);
@@ -39,7 +46,6 @@
             display: flex;
             flex-grow: 1;
             align-items: center;
-            justify-content: space-between;
 
             &:before,
             &:after {
@@ -61,12 +67,17 @@
             }
         }
 
+        &__html {
+            flex-grow: 1;
+            padding: v-bind(padding);
+        }
+
         &:after {
             position: absolute;
-            top: var(--1-pix);
-            bottom: var(--1-pix);
-            right: var(--1-pix);
-            left: var(--1-pix);
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
             display: block;
             content: '';
             border-image: url("/assets/border-9-slice.png") var(--b-i-slice) / var(--b-i-width);

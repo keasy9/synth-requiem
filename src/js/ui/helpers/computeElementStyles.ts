@@ -3,6 +3,8 @@ import {type Reactive} from 'vue';
 import {UiContainerDto, UiContainerLayout} from '@/ui/dto/UiContainerDto.ts';
 import {Config} from '@/config.ts';
 import {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
+import {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
+import {UiBarDto} from '@/ui/dto/UiBarDto.ts';
 
 export function computeElementStyles(elem: UiElemDto|Reactive<UiElemDto>): Record<string, string> {
     const styles: Record<string, string> = {};
@@ -27,8 +29,13 @@ export function computeElementStyles(elem: UiElemDto|Reactive<UiElemDto>): Recor
         styles['border-style'] = 'solid';
     }
 
-    styles['padding'] = elem.padding.map(p => p * Config.baseScale + 'px').join(' ');
+    if (!(elem instanceof UiButtonDto)) {
+        // из-за костылей с бордером, паддинг кнопка сама должна себе расчитывать
+        styles['padding'] = elem.padding.map(p => p * Config.baseScale + 'px').join(' ');
+    }
+
     styles['margin'] = elem.margin.map(p => p * Config.baseScale + 'px').join(' ');
+    if (!elem.visible) styles['visibility'] = 'hidden';
 
     return styles;
 }
