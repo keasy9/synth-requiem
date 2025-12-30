@@ -2,7 +2,7 @@
     <button
         class="ui-button"
         @click="props.dto.click()"
-        @focus="props.dto.focus(); console.log($event)"
+        @focus="props.dto.focus()"
         @mouseenter="onMouseEnter"
         ref="root"
     >
