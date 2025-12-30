@@ -1,8 +1,10 @@
 <template>
     <button
         class="ui-button"
-        @click="onClick"
+        @click="props.dto.click()"
+        @focus="props.dto.focus()"
         @mouseenter="$el.focus()"
+        ref="root"
     >
         <span class="ui-button__content">
             <span
@@ -15,16 +17,17 @@
 
 <script setup lang="ts">
     import type {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
-    import {computed} from 'vue';
+    import {computed, useTemplateRef, watch} from 'vue';
     import {Config} from '@/config.ts';
 
     const props = defineProps<{ dto: UiButtonDto }>();
 
+    const root = useTemplateRef<HTMLButtonElement>('root');
     const padding = computed(() => props.dto.padding.map(p => p * Config.baseScale + 'px').join(' '))
 
-    function onClick() {
-        if (props.dto.onclick)  props.dto.onclick();
-    }
+    watch(() => props.dto.focused, () => {
+        if (props.dto.focused && !(document.hasFocus() && document.activeElement === root.value)) root.value?.focus()
+    }, {immediate: true});
 </script>
 
 <style lang="less">

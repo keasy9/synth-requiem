@@ -25,8 +25,8 @@
     import {nextTick, type Reactive, ref, useTemplateRef, watch} from 'vue';
     import {Config} from '@/config.ts';
     import {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
-    import {matchDtoComponent} from '@/ui/helpers/matchDtoComponent.ts';
-    import {computeElementStyles} from '@/ui/helpers/computeElementStyles.ts';
+    import {matchDtoComponent} from '@/ui/utils/matchDtoComponent.ts';
+    import {computeElementStyles} from '@/ui/utils/computeElementStyles.ts';
 
     const root = useTemplateRef('root');
 

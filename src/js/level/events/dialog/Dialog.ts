@@ -12,6 +12,8 @@ import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
 import type {Reactive} from 'vue';
 import {GAME} from '@/main.ts';
+import {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
+import UiButton from '@/ui/components/UiButton.vue';
 
 const NpcPortrait = {
     Test: 'test',
@@ -27,7 +29,7 @@ type MonologAnswer = {
 export type MonologConf = {
     npc: AnyNpcPortrait,
     name: string,
-    text: string, // todo локализация и цветные вставки как в katana zero
+    text: string, // todo локализация
     answers?: MonologAnswer[],
     nextMonolog?: number, // индекс в monologues родительского диалога
     time?: number,
@@ -48,11 +50,16 @@ export class Dialog implements TimelineEvent {
     protected rootContainer?: Reactive<UiContainerDto>;
     protected textbox?: Reactive<UiTextboxDto>;
     protected name?: Reactive<UiTextboxDto>;
-    protected buttonsContainer?: Reactive<UiContainerDto>;
+    protected buttonsContainer?: Reactive<UiContainerDto<UiButtonDto>>;
     protected bar?: Reactive<UiBarDto>;
     protected npcPortrait?: Reactive<UiSpriteDto>;
 
     protected barTimer?: Timer;
+
+    protected textTimer?: Timer;
+    protected typingInterval: number = 40;
+    protected typingElem?: HTMLElement;
+    protected typingIndexes: number[] = [];
 
     public static create(conf: DialogConf): Dialog {
         return new Dialog(conf);
@@ -86,6 +93,8 @@ export class Dialog implements TimelineEvent {
     }
 
     protected setMonolog(conf: MonologConf): void {
+        this.currentMonolog = conf;
+
         this.setText(conf.text);
         this.setNpc(conf.npc);
         this.setName(conf.name);
@@ -118,19 +127,36 @@ export class Dialog implements TimelineEvent {
     }
 
     protected setText(text: string): void {
-        // todo перетащить функционал анимации появления текста сюда из vue, и сделать чтобы таймер запускался только после полного появления текста
         if (!this.textbox) {
-            this.textbox = ui().text(text)
+            this.textbox = ui().text('')
                 .grow()
-                .type()
                 .withMargin(0, 0, 10, -40)
                 .withPadding(3, 3, 3, 40)
                 .border(1, 0, 0, 0, UiColor.Primary)
                 .reactive();
 
         } else {
-            this.textbox.content = text;
+            this.textbox.content = '';
         }
+
+        if (!this.textTimer) {
+            this.textTimer = new Timer({
+                interval: this.typingInterval,
+                repeats: true,
+                numberOfRepeats: -1,
+                action: () => this.typeText(),
+            });
+
+            GAME.add(this.textTimer);
+        } else {
+            this.textTimer.reset();
+        }
+
+        this.textTimer.start();
+
+        this.typingElem = document.createElement('div');
+        this.typingElem.innerHTML = text;
+        this.typingIndexes = [];
     }
 
     protected setNpc(npc: AnyNpcPortrait): void {
@@ -169,6 +195,8 @@ export class Dialog implements TimelineEvent {
         this.buttonsContainer.children = answers.map(answer => {
             const btn = ui().button().html(answer.text);
 
+            // todo моргание кнопки после клика полсекунды как в katana zero
+
             if ((typeof answer.nextMonolog === 'number') && (answer.nextMonolog in this.conf.monologues)) {
                 btn.callback(() => this.setMonolog(this.conf.monologues[answer.nextMonolog!]!));
 
@@ -192,13 +220,19 @@ export class Dialog implements TimelineEvent {
             }
 
             if (!this.barTimer) {
-                this.barTimer = new Timer({interval: time});
+                this.barTimer = new Timer({
+                    interval: time,
+                    action: () => {
+                        (
+                            this.buttonsContainer?.children.find(btn => btn.focused)
+                            ?? this.buttonsContainer?.children[0]
+                        ).click();
+                    }
+                });
                 GAME.add(this.barTimer);
             } else {
                 this.barTimer.reset(time);
             }
-
-            this.barTimer.start();
 
         } else {
             this.bar?.hide();
@@ -210,5 +244,69 @@ export class Dialog implements TimelineEvent {
         this.isStarted = false;
         delete this.currentMonolog;
         EventBus.emit(Events.DialogEnded);
+    }
+
+    protected sliceContent(elem: HTMLElement, level: number = 0): string {
+        this.typingIndexes[level] ??= 0;
+        const currentIndex = this.typingIndexes[level];
+
+        if (elem.nodeName === '#text') {
+            // сейчас печатается текст
+
+            if (currentIndex >= elem.textContent.length - 1) {
+                // вместо добавления последнего символа выводим весь текст
+                this.typingIndexes = this.typingIndexes.slice(0, -1);
+                if (this.typingIndexes.length) this.typingIndexes[level - 1]!++;
+                return elem.textContent;
+            }
+
+            this.typingIndexes[level]++;
+
+            return elem.textContent.slice(0, currentIndex + 1);
+
+        } else {
+            // печатается вложенный элемент
+
+            if (currentIndex >= elem.childNodes.length) {
+                this.typingIndexes = this.typingIndexes.slice(0, -1);
+                if (this.typingIndexes.length) this.typingIndexes[level - 1]!++;
+
+                if (level === 0) {
+                    this.textTimer?.stop();
+
+                    console.log(this);
+                    if (this.currentMonolog?.time) {
+                        this.barTimer?.start(); // текст напечатался, пора запускать таймер на ответ
+                    }
+
+                    return elem.innerHTML;
+                }
+
+                return elem.outerHTML;
+            }
+
+            const textParts = ([...elem.childNodes] as HTMLElement[])
+                .slice(0, currentIndex)
+                .map(el => el.nodeName === '#text' ? el.textContent : el.outerHTML);
+
+            // todo сейчас когда элемент полностью напечатался, два раза возвращается одна и та же строка
+            textParts.push(this.sliceContent(elem.childNodes[currentIndex] as HTMLElement, level + 1));
+
+            if (level === 0) return textParts.join('');
+
+            const elemClone = elem.cloneNode(false) as HTMLElement;
+            elemClone.innerHTML = textParts.join('');
+            return elemClone.outerHTML;
+        }
+    }
+
+    protected typeText(): void {
+        if (!this.typingElem || !this.textbox) return;
+
+        // начинаем с первого индекса первого элемента
+        if (this.typingIndexes.length < 1) this.typingIndexes.push(0);
+        if (this.typingIndexes.length < 2) this.typingIndexes.push(0);
+
+        this.textbox.content = this.sliceContent(this.typingElem);
     }
 }

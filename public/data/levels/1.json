@@ -34,7 +34,7 @@
                     {
                         "npc": "glorp",
                         "name": "Glorp",
-                        "text": "nky zoogle, zeekybooble beeble meep forp bogos binted?",
+                        "text": "nky zoogle, <span style=\"color:red\">zeekybooble</span> beeble meep forp bogos binted?",
                         "time": 2500,
                         "answers": [
                             {

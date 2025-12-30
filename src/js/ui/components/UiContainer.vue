@@ -27,8 +27,8 @@
     import {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
     import {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
     import {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
-    import {matchDtoComponent} from '@/ui/helpers/matchDtoComponent.ts';
-    import {computeElementStyles} from '@/ui/helpers/computeElementStyles.ts';
+    import {matchDtoComponent} from '@/ui/utils/matchDtoComponent.ts';
+    import {computeElementStyles} from '@/ui/utils/computeElementStyles.ts';
 
     const props = defineProps<{ dto: UiContainerDto }>();
 

@@ -10,8 +10,8 @@ export const UiContainerLayout = {
 
 export type AnyUiContainerLayout = EnumValue<typeof UiContainerLayout>
 
-export class UiContainerDto extends UiElemDto {
-    public children: Reactive<UiElemDto>[] = [];
+export class UiContainerDto<TChildren extends UiElemDto = UiElemDto> extends UiElemDto {
+    public children: Reactive<TChildren>[] = [];
     public layout: AnyUiContainerLayout = UiContainerLayout.Rows;
     public gap: number = 0;
 
@@ -61,10 +61,10 @@ export class UiContainerDto extends UiElemDto {
      * Добавить в контейнер элементы. Можно передавать реактивные ссылки на элементы.
      * @param children
      */
-    public with(...children: (UiElemDto|Reactive<UiElemDto>)[]): this {
+    public with(...children: (TChildren|Reactive<TChildren>)[]): this {
         children.forEach(child => {
-            if (isReactive(child)) this.children.push(child);
-            else this.children.push(child.reactive());
+            if (isReactive(child)) this.children.push(child as Reactive<TChildren>);
+            else this.children.push((child as TChildren).reactive());
         });
 
         return this;

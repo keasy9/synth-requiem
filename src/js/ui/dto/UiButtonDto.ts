@@ -4,6 +4,7 @@ export class UiButtonDto extends UiElemDto {
     public content: string = '';
     public onclick?: Function;
     public padding: [number, number, number, number] = [1, 1, 1, 1];
+    public focused: boolean = false;
 
     /**
      * Установить внутренний html.
@@ -20,6 +21,16 @@ export class UiButtonDto extends UiElemDto {
      */
     public callback(callback: Function): this {
         this.onclick = callback;
+        return this;
+    }
+
+    public focus(): this {
+        this.focused = true;
+        return this;
+    }
+
+    public click(): this {
+        this.onclick ? this.onclick() : null;
         return this;
     }
 }

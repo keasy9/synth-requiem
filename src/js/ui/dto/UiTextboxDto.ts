@@ -2,7 +2,6 @@ import {UiElemDto} from '@/ui/dto/UiElemDto.ts';
 
 export class UiTextboxDto extends UiElemDto {
     public content: string = '';
-    public typing: boolean = false;
 
     /**
      * Установить внутренний html.
@@ -28,15 +27,6 @@ export class UiTextboxDto extends UiElemDto {
      */
     public prepend(html: string): this {
         this.content = html + this.content;
-        return this;
-    }
-
-    /**
-     * Включить или выключить анимацию печати текста.
-     * @param typing
-     */
-    public type(typing: boolean = true): this {
-        this.typing = typing;
         return this;
     }
 }
