@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       excalibur:
-        specifier: ^0.31.0
-        version: 0.31.0
+        specifier: ^0.32.0
+        version: 0.32.0
       vue:
         specifier: ^3.5.22
         version: 3.5.22(typescript@5.9.3)
@@ -268,8 +268,8 @@ packages:
   estree-walker@2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
 
-  excalibur@0.31.0:
-    resolution: {integrity: sha512-xVNiRdv4N13XRG9lMbQdwhjSIB3TdXEd1v8dtx876k14rJZb0KyzfO7EHpU7nz/NB/mr8aobh45yo4o5JeaOrw==}
+  excalibur@0.32.0:
+    resolution: {integrity: sha512-anCvsZK2Dh3BTlw/ERHr3fvfqF2vdJHw88soCs3r6EIwxbhibNRILMZw3Ae6GMTY8FkzRfkGLyk7DlEZVesUaw==}
 
   fdir@6.5.0:
     resolution: {integrity: sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==}
@@ -731,7 +731,7 @@ snapshots:
 
   estree-walker@2.0.2: {}
 
-  excalibur@0.31.0: {}
+  excalibur@0.32.0: {}
 
   fdir@6.5.0(picomatch@4.0.3):
     optionalDependencies:
