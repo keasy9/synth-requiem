@@ -1,10 +1,16 @@
 import {UiElemDto} from '@/ui/dto/UiElemDto.ts';
+import {EventBus, Events} from '@/helpers/events/EventBus.ts';
 
 export class UiButtonDto extends UiElemDto {
     public content: string = '';
     public onclick?: Function;
     public padding: [number, number, number, number] = [1, 1, 1, 1];
     public focused: boolean = false;
+
+    constructor() {
+        super();
+        EventBus.on(Events.UIButtonUnfocus, () => this.focused = false);
+    }
 
     /**
      * Установить внутренний html.

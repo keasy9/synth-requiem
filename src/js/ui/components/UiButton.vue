@@ -2,8 +2,8 @@
     <button
         class="ui-button"
         @click="props.dto.click()"
-        @focus="props.dto.focus()"
-        @mouseenter="$el.focus()"
+        @focus="props.dto.focus(); console.log($event)"
+        @mouseenter="onMouseEnter"
         ref="root"
     >
         <span class="ui-button__content">
@@ -19,14 +19,24 @@
     import type {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
     import {computed, useTemplateRef, watch} from 'vue';
     import {Config} from '@/config.ts';
+    import {EventBus, Events} from '@/helpers/events/EventBus.ts';
 
     const props = defineProps<{ dto: UiButtonDto }>();
 
     const root = useTemplateRef<HTMLButtonElement>('root');
     const padding = computed(() => props.dto.padding.map(p => p * Config.baseScale + 'px').join(' '))
 
+    function onMouseEnter() {
+        EventBus.emit(Events.UIButtonUnfocus);
+        root.value?.focus();
+        props.dto.focus();
+    }
+
     watch(() => props.dto.focused, () => {
-        if (props.dto.focused && !(document.hasFocus() && document.activeElement === root.value)) root.value?.focus()
+        if (props.dto.focused && !(document.hasFocus() && document.activeElement === root.value)) {
+            root.value?.focus();
+        }
+        else if (!props.dto.focused && document.hasFocus() && document.activeElement === root.value) root.value?.blur();
     }, {immediate: true});
 </script>
 

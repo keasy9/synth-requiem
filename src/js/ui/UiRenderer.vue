@@ -8,7 +8,7 @@
                 [`ui__elem--${elem.anchor}`]: elem.anchor,
                 [getComponentClass(elem)]: true
             }"
-            :style="computeElementStyles(elem)"
+            :style="useElementStyles(elem).value"
             :is="matchDtoComponent(elem)"
             :dto="elem"
         />
@@ -26,7 +26,7 @@
     import {Config} from '@/config.ts';
     import {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
     import {matchDtoComponent} from '@/ui/utils/matchDtoComponent.ts';
-    import {computeElementStyles} from '@/ui/utils/computeElementStyles.ts';
+    import {useElementStyles} from '@/ui/utils/useElementStyles.ts';
 
     const root = useTemplateRef('root');
 

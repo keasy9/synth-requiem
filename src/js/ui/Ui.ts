@@ -6,6 +6,7 @@ import {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
 import {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
 import {UiBarDto} from '@/ui/dto/UiBarDto.ts';
 
+// todo вместо DTO должны быть сущности с кастомным компонентом графики и прямым доступом к dom-элементу, тогда в них можно будет хранить логику и это будет гораздо удобнее
 export function ui() {
     return {
         button: () => new UiButtonDto(),

@@ -20,6 +20,7 @@ export abstract class UiElemDto {
     public borderWidth: [number, number, number, number] = [0, 0, 0, 0];
     public borderColor?: Color;
     public visible?: boolean = true;
+    public interactable?: boolean = true;
 
     public constructor() {
         this._id = getElemId();
@@ -152,6 +153,15 @@ export abstract class UiElemDto {
      */
     public show(): this {
         this.visible = true;
+        return this;
+    }
+
+    /**
+     * Установить интерактивность элемента. Неинтерактивные элементы не реагируют на действия пользователя.
+     * @param interactive
+     */
+    public interactive(interactive: boolean =  true): this {
+        this.interactable = interactive;
         return this;
     }
 }

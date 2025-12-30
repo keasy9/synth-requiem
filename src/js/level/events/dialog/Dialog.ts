@@ -193,18 +193,53 @@ export class Dialog implements TimelineEvent {
         this.buttonsContainer ??= ui().box().withGap(3).reactive();
 
         this.buttonsContainer.children = answers.map(answer => {
-            const btn = ui().button().html(answer.text);
+            const btn = ui().button().html(answer.text).reactive();
 
-            // todo моргание кнопки после клика полсекунды как в katana zero
+            let cb;
 
             if ((typeof answer.nextMonolog === 'number') && (answer.nextMonolog in this.conf.monologues)) {
-                btn.callback(() => this.setMonolog(this.conf.monologues[answer.nextMonolog!]!));
+                cb = () => this.setMonolog(this.conf.monologues[answer.nextMonolog!]!);
 
             } else {
-                btn.callback(this.end.bind(this));
+                cb = this.end.bind(this);
             }
 
-            return btn.reactive();
+            btn.callback(() => {
+                // 1) блокируем взаимодействие с диалогом
+                this.rootContainer?.interactive(false);
+
+                // 2) останавливаем таймер на выбор ответа и анимацию печати текста
+                this.barTimer?.pause();
+                this.textTimer?.stop();
+                this.textbox.content = this.currentMonolog?.text;
+
+                // 3) запускаем таймер моргания кнопки
+                const blinkTimer = new Timer({
+                    interval: 80,
+                    action: () => {
+                        btn.visible = !btn.visible
+                    },
+                    repeats: true,
+                    numberOfRepeats: 7,
+                });
+
+                GAME.add(blinkTimer);
+                blinkTimer.start();
+
+                // 4) запускаем таймер реакции на нажатие
+                const reactTimer = new Timer({
+                    interval: 560,
+                    action: () => {
+                        cb();
+                        this.rootContainer?.interactive(true);
+                    },
+                });
+
+                GAME.add(reactTimer);
+                reactTimer.start();
+            });
+
+            return btn;
         });
     }
 
@@ -274,7 +309,6 @@ export class Dialog implements TimelineEvent {
                 if (level === 0) {
                     this.textTimer?.stop();
 
-                    console.log(this);
                     if (this.currentMonolog?.time) {
                         this.barTimer?.start(); // текст напечатался, пора запускать таймер на ответ
                     }

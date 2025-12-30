@@ -12,7 +12,7 @@
             v-for="elem in dto.children"
             :key="elem.id"
             :class="{ [getComponentClass(elem)]: true }"
-            :style="computeElementStyles(elem)"
+            :style="useElementStyles(elem).value"
             :is="matchDtoComponent(elem)"
             :dto="elem"
         />
@@ -28,7 +28,7 @@
     import {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
     import {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
     import {matchDtoComponent} from '@/ui/utils/matchDtoComponent.ts';
-    import {computeElementStyles} from '@/ui/utils/computeElementStyles.ts';
+    import {useElementStyles} from '@/ui/utils/useElementStyles.ts';
 
     const props = defineProps<{ dto: UiContainerDto }>();
 
