@@ -1,12 +1,32 @@
 import {ActionsComponent, type Engine, Entity} from 'excalibur';
-import {type AnyDomElementType, DomComponent, DomPositionAnchor} from '@/ui/components/DomComponent.ts';
-import {UiState} from '@/ui/State.ts';
-import {type Reactive, reactive} from 'vue';
+import {type AnyDomElementType, DomComponent} from '@/ui/components/DomComponent.ts';
+import {UiDtoState, UiElementsState} from '@/ui/State.ts';
+import {type Reactive} from 'vue';
 import type {EnumValue} from '@/utils/types.ts';
 
-// TODO по сравнению с DTO получились тормоза. Попробовать отказаться от vue в сторону прямой манипуляции dom-элементами
+export const DomPositionAnchor = {
+    // по центру экрана
+    Center: 'center',
+    // на всю ширину, внизу экрана
+    Bottom: 'bottom',
+} as const;
+
+export type AnyDomPositionAnchor = EnumValue<typeof DomPositionAnchor>;
+
+export interface DomElementDto {
+    type: AnyDomElementType;
+    anchor: AnyDomPositionAnchor;
+    id: number,
+}
+
 export abstract class DomElement extends Entity<DomComponent | ActionsComponent> {
     public name = `DomEl#${this.id}`;
+
+    protected abstract _dto: Reactive<DomElementDto>;
+
+    public get dto(): Reactive<DomElementDto> {
+        return this._dto;
+    }
 
     public get element(): DomComponent {
         return this.get(DomComponent);
@@ -35,7 +55,7 @@ export abstract class DomElement extends Entity<DomComponent | ActionsComponent>
      * @param anchor
      */
     public setAnchor(anchor: EnumValue<typeof DomPositionAnchor>): this {
-        this.element.anchor = anchor;
+        this.dto.anchor = anchor;
         return this;
     }
 
@@ -43,14 +63,18 @@ export abstract class DomElement extends Entity<DomComponent | ActionsComponent>
      * @inheritDoc
      */
     public onAdd(_: Engine) {
-        if (!this.parent) UiState[this.id] = this;
+        if (!this.parent) {
+            UiDtoState[this.id] = this._dto;
+            UiElementsState[this.id] = this;
+        }
     }
 
     /**
      * @inheritDoc
      */
     public onRemove(_: Engine) {
-        delete UiState[this.id];
+        delete UiDtoState[this.id];
+        delete UiElementsState[this.id];
     }
 
     /**
@@ -71,13 +95,5 @@ export abstract class DomElement extends Entity<DomComponent | ActionsComponent>
     public clearStyle(key: string): this {
         this.element.clearStyle(key);
         return this;
-    }
-
-    /**
-     * Возвращает реактивную обёртку элемента.
-     * Если планируется модифицировать элемент, рекомендуется использовать его реактивную обёртку, чтобы состояние корректно обновлялось.
-     */
-    public reactive(): Reactive<this> {
-        return reactive(this);
     }
 }

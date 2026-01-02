@@ -1,48 +1,49 @@
 <template>
     <div
         class="ui-container"
-        :class="{
-            [`ui-container--${entity.layout}`]: entity.layout,
-            'ui-container--gap': entity.gap,
-        }"
+        :class="{ [`ui-container--${dto.layout}`]: dto.layout }"
         ref="root"
     >
         <component
             class="ui-container__elem"
-            v-for="elem in entity.children"
+            v-for="elem in dto.children"
             :key="elem.id"
             :class="{ [getComponentClass(elem)]: true }"
             :is="matchComponent(elem)"
-            :entity="elem"
+            :dto="elem"
         />
     </div>
 </template>
 
 <script setup lang="ts">
-    import {computed, type Reactive, useTemplateRef} from 'vue';
+    import {type Reactive, useTemplateRef} from 'vue';
     import {matchComponent} from '@/ui/renderer/utils/matchComponent.ts';
-    import type {DomElement} from '@/ui/entities/abstract/DomElement.ts';
-    import {DomBarElement} from '@/ui/entities/DomBarElement.ts';
-    import {DomButtonElement} from '@/ui/entities/DomButtonElement.ts';
-    import {DomContainerElement} from '@/ui/entities/DomContainerElement.ts';
-    import {DomTextboxElement} from '@/ui/entities/DomTextboxElement.ts';
-    import {DomSpriteElement} from '@/ui/entities/DomSpriteElement.ts';
+    import type {DomElementDto} from '@/ui/entities/abstract/DomElement.ts';
+    import {type DomContainerDto} from '@/ui/entities/DomContainerElement.ts';
     import {setElem} from '@/ui/renderer/utils/setElem.ts';
+    import {DomElementType} from '@/ui/components/DomComponent.ts';
 
-    const props = defineProps<{ entity: DomContainerElement }>();
+    const props = defineProps<{ dto: DomContainerDto }>();
     const root = useTemplateRef<HTMLDivElement>('root');
 
-    function getComponentClass(elem: DomElement|Reactive<DomElement>): string {
-        if (elem instanceof DomBarElement) return 'ui-container__elem--bar';
-        else if (elem instanceof DomButtonElement) return 'ui-container__elem--button';
-        else if (elem instanceof DomContainerElement) return 'ui-container__elem--container';
-        else if (elem instanceof DomTextboxElement) return 'ui-container__elem--textbox';
-        else if (elem instanceof DomSpriteElement) return 'ui-container__elem--sprite';
+    function getComponentClass(elem: Reactive<DomElementDto>): string {
+        switch (elem.type) {
+            case DomElementType.Bar:
+                return 'ui-container__elem--bar';
+            case DomElementType.Button:
+                return 'ui-container__elem--button';
+            case DomElementType.Container:
+                return 'ui-container__elem--container';
+            case DomElementType.Sprite:
+                return 'ui-container__elem--sprite';
+            case DomElementType.Textbox:
+                return 'ui-container__elem--textbox';
+        }
 
         return '';
     }
 
-    setElem(root, props.entity);
+    setElem(root, props.dto.id);
 </script>
 
 <style lang="less">

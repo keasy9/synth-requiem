@@ -1,7 +1,9 @@
-import {DomElement} from '@/ui/entities/abstract/DomElement.ts';
+import {DomElement, type DomElementDto, DomPositionAnchor} from '@/ui/entities/abstract/DomElement.ts';
 import {DomElementType} from '@/ui/components/DomComponent.ts';
 import {type Engine, type EntityEvents, type Handler, Timer, GameEvent, type EventKey, type Subscription} from 'excalibur';
 import {GAME} from '@/main.ts';
+import type {Reactive} from 'vue';
+import {reactive} from 'vue';
 
 export class AnimationEndEvent<T> extends GameEvent<T> {
     engine: Engine;
@@ -17,10 +19,19 @@ export interface DomTextboxEvents extends EntityEvents {
     animationend: AnimationEndEvent<DomTextboxElement>;
 }
 
+export interface DomTextboxDto extends DomElementDto {
+    type: typeof DomElementType.Textbox;
+    content?: string;
+}
+
 export class DomTextboxElement extends DomElement {
     public name = `DomTextbox#${this.id}`;
 
-    public content: string = '';
+    protected _dto: Reactive<DomTextboxDto> = reactive({
+        type: DomElementType.Textbox,
+        anchor: DomPositionAnchor.Center,
+        id: this.id,
+    });
 
     protected _typingTimer?: Timer;
     protected _typingSource?: HTMLElement;
@@ -35,7 +46,7 @@ export class DomTextboxElement extends DomElement {
      * @param html
      */
     public setContent(html: string): this {
-        this.content = html;
+        this._dto.content = html;
         return this;
     }
 
@@ -51,7 +62,7 @@ export class DomTextboxElement extends DomElement {
      * @param onEnd
      */
     public animateTyping(symbolDelay: 40, html?: string, onEnd?: Handler<AnimationEndEvent<DomTextboxElement>>): this {
-        if (html) this.content = html;
+        if (html) this._dto.content = html;
         if (onEnd) this.on('animationend', onEnd);
 
         if (!this._typingTimer) {
@@ -70,7 +81,7 @@ export class DomTextboxElement extends DomElement {
         this._typingTimer.start();
 
         this._typingSource = document.createElement('span');
-        this._typingSource.innerHTML = this.content;
+        this._typingSource.innerHTML = this._dto.content ?? '';
         this._typingIndexes = [];
 
         return this;
@@ -161,7 +172,7 @@ export class DomTextboxElement extends DomElement {
         if (this._typingIndexes.length < 1) this._typingIndexes.push(0);
         if (this._typingIndexes.length < 2) this._typingIndexes.push(0);
 
-        this.content = this.sliceContent(this._typingSource);
+        this._dto.content = this.sliceContent(this._typingSource);
     }
 
     public emit<TEventName extends EventKey<DomTextboxEvents>>(eventName: TEventName, event?: DomTextboxEvents[TEventName]): void {

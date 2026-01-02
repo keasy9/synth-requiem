@@ -1,12 +1,23 @@
-import {DomElement} from '@/ui/entities/abstract/DomElement.ts';
+import {DomElement, type DomElementDto, DomPositionAnchor} from '@/ui/entities/abstract/DomElement.ts';
 import {DomElementType, DomEvents} from '@/ui/components/DomComponent.ts';
+import {reactive, type Reactive} from 'vue';
+
+export interface DomButtonDto extends DomElementDto {
+    type: typeof DomElementType.Button;
+    content?: string;
+    padding?: [number, number, number, number];
+}
 
 export class DomButtonElement extends DomElement {
     public name = `DomButton#${this.id}`;
 
-    public content: string = '';
+    protected _dto: Reactive<DomButtonDto> = reactive({
+        type: DomElementType.Button,
+        anchor: DomPositionAnchor.Center,
+        id: this.id,
+    });
+
     public focused: boolean = false;
-    public padding: [number, number, number, number] = [0, 0, 0, 0];
 
     constructor() {
         super(DomElementType.Button);
@@ -19,7 +30,7 @@ export class DomButtonElement extends DomElement {
      * @param html
      */
     public setContent(html: string): this {
-        this.content = html;
+        this._dto.content = html;
         return this;
     }
 
@@ -33,7 +44,7 @@ export class DomButtonElement extends DomElement {
         padding[2] ??= padding[0]!;
         padding[3] ??= padding[1];
 
-        this.padding = padding as [number, number, number, number];
+        this._dto.padding = padding as [number, number, number, number];
         return this;
     }
 
@@ -65,7 +76,7 @@ export class DomButtonElement extends DomElement {
         if (key.startsWith('padding')) {
             // padding обрабатываем как особый случай из-за костылей для border-image кнопки
 
-            let value = this.padding;
+            let value = this._dto.padding ?? [0, 0, 0, 0];
 
             if (key.endsWith('-top')) value = [0, value[1], value[2], value[3]];
             else if (key.endsWith('-right')) value = [value[0], 0, value[2], value[3]];

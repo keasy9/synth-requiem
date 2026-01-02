@@ -12,8 +12,9 @@ import {DomTextboxElement} from '@/ui/entities/DomTextboxElement.ts';
 import {DomButtonElement} from '@/ui/entities/DomButtonElement.ts';
 import {DomBarElement} from '@/ui/entities/DomBarElement.ts';
 import {DomSpriteElement} from '@/ui/entities/DomSpriteElement.ts';
-import {UiState} from '@/ui/State.ts';
-import {DomEvents, DomPositionAnchor} from '@/ui/components/DomComponent.ts';
+import {UiDtoState, UiElementsState} from '@/ui/State.ts';
+import {DomEvents} from '@/ui/components/DomComponent.ts';
+import {DomPositionAnchor} from '@/ui/entities/abstract/DomElement.ts';
 
 const NpcPortrait = {
     Test: 'test',
@@ -114,8 +115,7 @@ export class Dialog extends DomContainerElement implements TimelineEvent {
         this.textEl ??= new DomTextboxElement()
             .setStyle('margin', [0, 0, 10, -40])
             .setStyle('padding', [3, 3, 3, 40])
-            .setStyle('border-top', `1px solid ${UiColor.Primary.toHex()}`)
-            .reactive();
+            .setStyle('border-top', `1px solid ${UiColor.Primary.toHex()}`);
 
         this.textEl.animateTyping(40, text, this.onTextTyped.bind(this));
     }
@@ -126,28 +126,25 @@ export class Dialog extends DomContainerElement implements TimelineEvent {
             .autoWidth(1)
             .one();
 
-        this.portraitEl ??= new DomSpriteElement()
-            .setScale(1.5) // для лучшего визуала
-            .reactive();
+        this.portraitEl ??= new DomSpriteElement();
 
-        this.portraitEl.framesFrom(Dialog.npcPortraits[npc]!);
+        this.portraitEl.framesFrom(Dialog.npcPortraits[npc]!).setScale(1.5) // для лучшего визуала;
     }
 
     protected setName(name: string): void {
         this.nameEl = new DomTextboxElement()
             .setStyle('margin-left', -40)
             .setStyle('padding', [3, 8, 6, 40])
-            .setStyle('border-top', `1px solid ${UiColor.Primary.toHex()}`)
-            .reactive();
+            .setStyle('border-top', `1px solid ${UiColor.Primary.toHex()}`);
 
         this.nameEl.setContent(name)
     }
 
     protected setAnswers(answers: MonologAnswer[]): void {
-        this.buttonsEl ??= new DomContainerElement<DomButtonElement>().setStyle('gap', 3).reactive();
+        this.buttonsEl ??= new DomContainerElement<DomButtonElement>().setStyle('gap', 3);
 
         this.buttonsEl.addChildren(...answers.map(answer => {
-            const btn = new DomButtonElement().setContent(answer.text).reactive();
+            const btn = new DomButtonElement().setContent(answer.text);
 
             let cb;
 
@@ -201,8 +198,7 @@ export class Dialog extends DomContainerElement implements TimelineEvent {
     protected resetBar(time?: number): void {
         this.barEl ??= new DomBarElement()
             .setColor(20, UiColor.Danger)
-            .setStyle('margin-left', -40)
-            .reactive();
+            .setStyle('margin-left', -40);
 
         if (time) {
             this.barEl
@@ -222,7 +218,8 @@ export class Dialog extends DomContainerElement implements TimelineEvent {
     }
 
     protected end(): void {
-        delete UiState[this.id];
+        delete UiDtoState[this.id];
+        delete UiElementsState[this.id];
 
         this.isStarted = false;
         delete this.currentMonolog;

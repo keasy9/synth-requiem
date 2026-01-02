@@ -1,6 +1,8 @@
-import {DomElement} from '@/ui/entities/abstract/DomElement.ts';
+import {DomElement, type DomElementDto, DomPositionAnchor} from '@/ui/entities/abstract/DomElement.ts';
 import {DomElementType} from '@/ui/components/DomComponent.ts';
 import {Animation, AnimationStrategy, Sprite} from 'excalibur';
+import type {Reactive} from 'vue';
+import {reactive} from 'vue';
 
 export type SpriteFrameDto = {
     src: string,
@@ -10,15 +12,24 @@ export type SpriteFrameDto = {
     height: number,
 };
 
+export interface DomSpriteDto extends DomElementDto {
+    type: typeof DomElementType.Sprite;
+    frames?: SpriteFrameDto[];
+    frameDuration?: number;
+    strategy?: AnimationStrategy;
+    width?: number;
+    height?: number;
+    scale?: number;
+}
+
 export class DomSpriteElement extends DomElement {
     public name = `DomSprite#${this.id}`;
 
-    public frames: SpriteFrameDto[] = [];
-    public frameDuration: number = 100;
-    public strategy: AnimationStrategy = AnimationStrategy.Freeze;
-    public width: number = 0;
-    public height: number = 0;
-    public scale: number = 1;
+    protected _dto: Reactive<DomSpriteDto> = reactive({
+        type: DomElementType.Sprite,
+        anchor: DomPositionAnchor.Center,
+        id: this.id,
+    });
 
     constructor() {
         super(DomElementType.Sprite);
@@ -33,8 +44,8 @@ export class DomSpriteElement extends DomElement {
         if (source instanceof Animation) {
             const frames: SpriteFrameDto[] = [];
 
-            this.strategy = source.strategy;
-            this.frameDuration = source.frameDuration;
+            this._dto.strategy = source.strategy;
+            this._dto.frameDuration = source.frameDuration;
 
             source.frames
                 .forEach(frame => {
@@ -46,18 +57,18 @@ export class DomSpriteElement extends DomElement {
                     }
                 });
 
-            this.frames = frames;
+            this._dto.frames = frames;
 
         } else if (source instanceof Sprite) {
-            this.frames = [{
+            this._dto.frames = [{
                 ...source.sourceView,
                 src: source.image.path,
             }];
         }
 
-        this.width = source.width;
-        this.height = source.height
-        this.scale = source.scale.x;
+        this._dto.width = source.width;
+        this._dto.height = source.height
+        this._dto.scale = source.scale.x;
 
         return this;
     }
@@ -67,7 +78,8 @@ export class DomSpriteElement extends DomElement {
      * @param scale
      */
     public setScale(scale: number): this {
-        this.scale = scale;
+        this._dto.scale = scale;
+
         return this;
     }
 

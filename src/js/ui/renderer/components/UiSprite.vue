@@ -5,22 +5,21 @@
 </template>
 
 <script setup lang="ts">
-    import type {SpriteFrameDto} from '@/ui/dto/UiSpriteDto.ts';
     import {computed, ref, useTemplateRef, watch} from 'vue';
     import {Config} from '@/config.ts';
     import {AnimationStrategy} from 'excalibur';
     import {setElem} from '@/ui/renderer/utils/setElem.ts';
-    import type {DomSpriteElement} from '@/ui/entities/DomSpriteElement.ts';
+    import type {DomSpriteDto, SpriteFrameDto} from '@/ui/entities/DomSpriteElement.ts';
 
-    const props = defineProps<{ entity: DomSpriteElement }>();
+    const props = defineProps<{ dto: DomSpriteDto }>();
     const root = useTemplateRef<HTMLDivElement>('root');
 
-    const scale = computed(() => Config.baseScale * props.entity.scale);
-    const width = computed(() => props.entity.width * scale.value + 'px');
-    const height = computed(() => props.entity.height * scale.value + 'px');
+    const scale = computed(() => Config.baseScale * (props.dto.scale ?? 1));
+    const width = computed(() => (props.dto.width ?? 50) * scale.value + 'px');
+    const height = computed(() => (props.dto.height ?? 50) * scale.value + 'px');
 
     const currentFrameIndex = ref<number>(0);
-    const currentFrame = computed<SpriteFrameDto|undefined>(() => props.entity.frames[currentFrameIndex.value]);
+    const currentFrame = computed<SpriteFrameDto|undefined>(() => props.dto.frames ? props.dto.frames[currentFrameIndex.value] : undefined);
     const frameRatio = computed(() => (currentFrame.value?.width ?? 0) / (currentFrame.value?.height ?? 0));
     const frameX = computed(() => -(currentFrame.value?.x ?? 0) + 'px');
     const frameY = computed(() => -(currentFrame.value?.y ?? 0) + 'px');
@@ -32,8 +31,8 @@
         if (animationBackwards) currentFrameIndex.value--;
         else currentFrameIndex.value++;
 
-        if (currentFrameIndex.value > props.entity.frames.length - 1) {
-            switch (props.entity.strategy) {
+        if (currentFrameIndex.value > (props.dto.frames?.length ?? 0) - 1) {
+            switch (props.dto.strategy) {
                 case AnimationStrategy.Freeze:
                     currentFrameIndex.value--;
                     destroyInterval();
@@ -50,7 +49,7 @@
                     break;
             }
         } else if (currentFrameIndex.value < 0) {
-            if (props.entity.strategy === AnimationStrategy.PingPong) {
+            if (props.dto.strategy === AnimationStrategy.PingPong) {
                 animationBackwards = false;
                 currentFrameIndex.value++;
             }
@@ -58,19 +57,19 @@
     }
 
     function initInterval(): void {
-        interval = setInterval(nextFrame, props.entity.frameDuration);
+        interval = setInterval(nextFrame, props.dto.frameDuration);
     }
 
     function destroyInterval(): void {
         clearInterval(interval);
     }
 
-    watch(() => props.entity.frames.length, () => {
+    watch(() => props.dto.frames?.length, () => {
         destroyInterval();
-        if (props.entity.frames.length > 1) initInterval();
+        if (props.dto.frames?.length && props.dto.frames?.length > 1) initInterval();
     }, {immediate: true});
 
-    setElem(root, props.entity);
+    setElem(root, props.dto.id);
 </script>
 
 <style lang="less">

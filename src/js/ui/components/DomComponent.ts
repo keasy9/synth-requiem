@@ -19,13 +19,6 @@ export const DomEvents = {
     MouseLeave: 'mouseleave',
 } as const;
 
-export const DomPositionAnchor = {
-    // по центру экрана
-    Center: 'center',
-    // на всю ширину, внизу экрана
-    Bottom: 'bottom',
-} as const;
-
 export const DomElementType = {
     // прогрессбар
     Bar: 'bar',
@@ -39,7 +32,7 @@ export const DomElementType = {
     Textbox: 'textbox',
 } as const;
 
-export type AnyDomElementType = EnumValue<DomElementType>;
+export type AnyDomElementType = EnumValue<typeof DomElementType>;
 
 export class DomComponent extends Component implements Eventable {
     /**
@@ -58,11 +51,6 @@ export class DomComponent extends Component implements Eventable {
      * Тип элемента.
      */
     protected _type: AnyDomElementType;
-
-    /**
-     * Позиция элемента. Учитывается только у абсолютно-позиционированных элементов (без родителя).
-     */
-    public anchor: typeof DomPositionAnchor[keyof typeof DomPositionAnchor] = DomPositionAnchor.Center;
 
     /**
      * События элемента.
@@ -86,7 +74,7 @@ export class DomComponent extends Component implements Eventable {
 
         this._element = element;
 
-        this._element.exEntity = this;
+        if (this._element) this._element.exEntity = this;
 
         this.initEvents();
         this.applyQueuedStyles();
@@ -141,19 +129,19 @@ export class DomComponent extends Component implements Eventable {
 
         switch (ev.type) {
             case DomEvents.Focus:
-                this.events.emit(DomEvents.Focus, new DomFocusEvent(this._element, this, ev))
+                this.events.emit(DomEvents.Focus, new DomFocusEvent(this, this._element, ev))
                 break;
             case DomEvents.Blur:
-                this.events.emit(DomEvents.Focus, new DomBlurEvent(this._element, this, ev))
+                this.events.emit(DomEvents.Focus, new DomBlurEvent(this, this._element, ev))
                 break;
             case DomEvents.Click:
-                this.events.emit(DomEvents.Focus, new DomClickEvent(this._element, this, ev))
+                this.events.emit(DomEvents.Focus, new DomClickEvent(this, this._element, ev))
                 break;
             case DomEvents.MouseLeave:
-                this.events.emit(DomEvents.Focus, new DomMouseEnterEvent(this._element, this, ev))
+                this.events.emit(DomEvents.Focus, new DomMouseEnterEvent(this, this._element, ev))
                 break;
             case DomEvents.MouseEnter:
-                this.events.emit(DomEvents.Focus, new DomMouseLeaveEvent(this._element, this, ev))
+                this.events.emit(DomEvents.Focus, new DomMouseLeaveEvent(this, this._element, ev))
                 break;
         }
     }
@@ -178,23 +166,23 @@ export class DomComponent extends Component implements Eventable {
     public emit(eventName: typeof DomEvents[keyof typeof DomEvents], event?: DomComponentEvents[keyof DomComponentEvents]) {
         switch (eventName) {
             case DomEvents.Focus:
-                event ??= new DomFocusEvent(this._element, this);
+                event ??= new DomFocusEvent(this, this._element);
                 this._element?.focus();
                 break;
             case DomEvents.Blur:
-                event ??= new DomBlurEvent(this._element, this);
+                event ??= new DomBlurEvent(this, this._element);
                 this._element?.blur();
                 break;
             case DomEvents.Click:
-                event ??= new DomClickEvent(this._element, this);
+                event ??= new DomClickEvent(this, this._element);
                 this._element?.click();
                 break;
             case DomEvents.MouseEnter:
-                event ??= new DomMouseEnterEvent(this._element, this);
+                event ??= new DomMouseEnterEvent(this, this._element);
                 this._element?.dispatchEvent(new MouseEvent('mouseenter'));
                 break;
             case DomEvents.MouseLeave:
-                event ??= new DomMouseLeaveEvent(this._element, this);
+                event ??= new DomMouseLeaveEvent(this, this._element);
                 this._element?.dispatchEvent(new MouseEvent('mouseleave'));
                 break;
         }

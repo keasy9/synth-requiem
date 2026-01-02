@@ -1,47 +1,30 @@
 <template>
     <button
         class="ui-button"
-        @click="props.entity.element.emit(DomEvents.Click)"
-        @focus="props.entity.element.emit(DomEvents.Focus)"
-        @mouseenter="onMouseEnter"
+        @mouseenter="root?.focus()"
         ref="root"
     >
         <span class="ui-button__content">
             <span
                 class="ui-button__html"
-                v-html="entity.content"
+                v-html="dto.content"
             />
         </span>
     </button>
 </template>
 
 <script setup lang="ts">
-    import {computed, useTemplateRef, watch} from 'vue';
+    import {computed, useTemplateRef} from 'vue';
     import {Config} from '@/config.ts';
-    import {EventBus, Events} from '@/helpers/events/EventBus.ts';
-    import type {DomButtonElement} from '@/ui/entities/DomButtonElement.ts';
+    import type {DomButtonDto} from '@/ui/entities/DomButtonElement.ts';
     import {setElem} from '@/ui/renderer/utils/setElem.ts';
-    import {DomEvents} from '@/ui/components/DomComponent.ts';
 
-    const props = defineProps<{ entity: DomButtonElement }>();
+    const props = defineProps<{ dto: DomButtonDto }>();
 
     const root = useTemplateRef<HTMLButtonElement>('root');
-    const padding = computed(() => props.entity.padding.map(p => p * Config.baseScale + 'px').join(' '));
+    const padding = computed(() => props.dto.padding?.map(p => p * Config.baseScale + 'px').join(' ') ?? 0);
 
-    function onMouseEnter() {
-        EventBus.emit(Events.UIButtonUnfocus);
-        root.value?.focus();
-        props.entity.element.emit(DomEvents.Focus);
-    }
-
-    watch(() => props.entity.focused, () => {
-        if (props.entity.focused && !(document.hasFocus() && document.activeElement === root.value)) {
-            root.value?.focus();
-        }
-        else if (!props.entity.focused && document.hasFocus() && document.activeElement === root.value) root.value?.blur();
-    }, {immediate: true});
-
-    setElem(root, props.entity);
+    setElem(root, props.dto.id);
 </script>
 
 <style lang="less">

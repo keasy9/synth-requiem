@@ -2,45 +2,48 @@
     <div class="ui" ref="root">
         <component
             class="ui__elem"
-            v-for="elem in UiState"
+            v-for="elem in UiDtoState"
             :key="elem.id"
             :class="{
-                [`ui__elem--${elem.element.anchor}`]: elem.element.anchor,
-                [getComponentClass(elem)]: true
+                [`ui__elem--${elem.anchor}`]: elem.anchor,
+                [getComponentClass(elem)]: true,
             }"
             :is="matchComponent(elem)"
-            :entity="elem"
+            :dto="elem"
         />
     </div>
 </template>
 
 <script setup lang="ts">
-    import {UiState} from '@/ui/State.ts';
+    import {UiDtoState} from '@/ui/State.ts';
     import {nextTick, type Reactive, ref, useTemplateRef, watch} from 'vue';
     import {Config} from '@/config.ts';
     import {matchComponent} from '@/ui/renderer/utils/matchComponent.ts';
-    import type {DomElement} from '@/ui/entities/abstract/DomElement.ts';
-    import {DomBarElement} from '@/ui/entities/DomBarElement.ts';
-    import {DomButtonElement} from '@/ui/entities/DomButtonElement.ts';
-    import {DomContainerElement} from '@/ui/entities/DomContainerElement.ts';
-    import {DomTextboxElement} from '@/ui/entities/DomTextboxElement.ts';
-    import {DomSpriteElement} from '@/ui/entities/DomSpriteElement.ts';
+    import type {DomElementDto} from '@/ui/entities/abstract/DomElement.ts';
+    import {DomElementType} from '@/ui/components/DomComponent.ts';
 
     const root = useTemplateRef('root');
 
-    function getComponentClass(elem: DomElement|Reactive<DomElement>): string {
-        if (elem instanceof DomBarElement) return 'ui__elem--bar';
-        else if (elem instanceof DomButtonElement) return 'ui__elem--button';
-        else if (elem instanceof DomContainerElement) return 'ui__elem--container';
-        else if (elem instanceof DomTextboxElement) return 'ui__elem--textbox';
-        else if (elem instanceof DomSpriteElement) return 'ui__elem--sprite';
+    function getComponentClass(elem: Reactive<DomElementDto>): string {
+        switch (elem.type) {
+            case DomElementType.Bar:
+                return 'ui__elem--bar';
+            case DomElementType.Button:
+                return 'ui__elem--button';
+            case DomElementType.Container:
+                return 'ui__elem--container';
+            case DomElementType.Sprite:
+                return 'ui__elem--sprite';
+            case DomElementType.Textbox:
+                return 'ui__elem--textbox';
+        }
 
         return '';
     }
 
     const pixelRatio = ref(Config.baseScale);
 
-    watch(UiState, () => {
+    watch(UiDtoState, () => {
         nextTick(() => {
             if (root.value?.querySelector(':focus')) return;
             root.value?.querySelector('button')?.focus();

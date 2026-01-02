@@ -1,8 +1,10 @@
 import {onBeforeUnmount, onMounted, type TemplateRef} from 'vue';
-import type {DomElement} from '@/ui/entities/abstract/DomElement.ts';
-import type {MaybeReactive} from '@/utils/types.ts';
+import {UiElementsState} from '@/ui/State.ts';
 
-export function setElem(elem: TemplateRef<HTMLElement>, entity: MaybeReactive<DomElement>) {
-    onMounted(() => entity.element.element = elem?.value ?? undefined);
-    onBeforeUnmount(() => entity.element.element = undefined);
+export function setElem(elem: TemplateRef<HTMLElement>, entityId: number) {
+    const entity = UiElementsState[entityId];
+    if (entity) {
+        onMounted(() => entity.element.element = elem?.value ?? undefined);
+        onBeforeUnmount(() => entity.element.element = undefined);
+    }
 }

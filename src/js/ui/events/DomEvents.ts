@@ -6,7 +6,7 @@ abstract class DomEvent extends GameEvent<HTMLElement> {
     self: DomComponent;
     originalEvent?: Event;
 
-    constructor(element: HTMLElement, self: DomComponent, originalEvent?: Event) {
+    constructor(self: DomComponent, element?: HTMLElement, originalEvent?: Event) {
         super();
         this.element = element;
         this.self = self;

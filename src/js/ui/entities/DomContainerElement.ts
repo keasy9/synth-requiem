@@ -1,7 +1,9 @@
-import {DomElement} from '@/ui/entities/abstract/DomElement.ts';
+import {DomElement, type DomElementDto, DomPositionAnchor} from '@/ui/entities/abstract/DomElement.ts';
 import {DomElementType} from '@/ui/components/DomComponent.ts';
-import type {EnumValue, MaybeReactive} from '@/utils/types.ts';
-import {UiState} from '@/ui/State.ts';
+import type {EnumValue} from '@/utils/types.ts';
+import {UiDtoState, UiElementsState} from '@/ui/State.ts';
+import type {Reactive} from 'vue';
+import {reactive, toValue} from 'vue';
 
 export const DomContainerLayout = {
     Rows: 'rows',
@@ -11,10 +13,20 @@ export const DomContainerLayout = {
 
 export type AnyDomContainerLayout = EnumValue<typeof DomContainerLayout>
 
-export class DomContainerElement<TChildren extends MaybeReactive<DomElement> = MaybeReactive<DomElement>> extends DomElement {
+export interface DomContainerDto extends DomElementDto {
+    type: typeof DomElementType.Container;
+    layout?: AnyDomContainerLayout;
+    children?: DomElementDto[];
+}
+
+export class DomContainerElement<TChildren extends DomElement = DomElement> extends DomElement {
     public name = `DomContainer#${this.id}`;
 
-    public layout: AnyDomContainerLayout = DomContainerLayout.Rows;
+    protected _dto: Reactive<DomContainerDto> = reactive({
+        type: DomElementType.Container,
+        anchor: DomPositionAnchor.Center,
+        id: this.id,
+    });
 
     /**
      * @inheritDoc
@@ -30,8 +42,12 @@ export class DomContainerElement<TChildren extends MaybeReactive<DomElement> = M
     /**
      * @inheritDoc
      */
-    public addChild<TChild extends MaybeReactive<DomElement> = MaybeReactive<DomElement>>(entity: TChild): DomContainerElement<TChild | TChildren> {
-        delete UiState[entity.id];
+    public addChild<TChild extends DomElement = DomElement>(entity: TChild): DomContainerElement<TChild | TChildren> {
+        delete UiDtoState[entity.id];
+        UiElementsState[entity.id] = entity;
+        this._dto.children ??= [];
+        this._dto.children.push(toValue(entity.dto));
+
         return super.addChild(entity) as DomContainerElement<TChild | TChildren>;
     }
 
@@ -39,8 +55,8 @@ export class DomContainerElement<TChildren extends MaybeReactive<DomElement> = M
      * Добавить элементы в контейнер.
      * @param entity
      */
-    public addChildren<TChild extends MaybeReactive<DomElement> = MaybeReactive<DomElement>>(...entity: TChild[]): DomContainerElement<TChild | TChildren> {
-        entity.forEach(child => this.addChild(child));
+    public addChildren<TChild extends DomElement = DomElement>(...entities: TChild[]): DomContainerElement<TChild | TChildren> {
+        entities.forEach(child => this.addChild(child));
         return this as DomContainerElement<TChild | TChildren>;
     }
 
@@ -48,6 +64,10 @@ export class DomContainerElement<TChildren extends MaybeReactive<DomElement> = M
      * @inheritDoc
      */
     public removeChild(entity: TChildren): this {
+        if (this._dto.children) delete this._dto.children[this._dto.children.findIndex(child => child.id === entity.id)];
+
+        delete UiElementsState[entity.id];
+
         return super.removeChild(entity) as this;
     }
 
@@ -63,7 +83,7 @@ export class DomContainerElement<TChildren extends MaybeReactive<DomElement> = M
      * @param layout
      */
     public setLayout(layout: AnyDomContainerLayout): this {
-        this.layout = layout;
+        this._dto.layout = layout;
         return this;
     }
 
@@ -71,7 +91,7 @@ export class DomContainerElement<TChildren extends MaybeReactive<DomElement> = M
      * Расположить элементы колонками.
      */
     public setColsLayout(): this {
-        this.layout = DomContainerLayout.Cols;
+        this._dto.layout = DomContainerLayout.Cols;
         return this;
     }
 
@@ -79,7 +99,7 @@ export class DomContainerElement<TChildren extends MaybeReactive<DomElement> = M
      * Расположить элементы рядами.
      */
     public setRowsLayout(): this {
-        this.layout = DomContainerLayout.Rows;
+        this._dto.layout = DomContainerLayout.Rows;
         return this;
     }
 
@@ -87,7 +107,7 @@ export class DomContainerElement<TChildren extends MaybeReactive<DomElement> = M
      * Расположить элементы по сетке.
      */
     public setGridLayout(): this {
-        this.layout = DomContainerLayout.Grid;
+        this._dto.layout = DomContainerLayout.Grid;
         return this;
     }
 }

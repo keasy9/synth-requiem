@@ -6,15 +6,15 @@
 
 <script setup lang="ts">
     import {computed, useTemplateRef} from 'vue';
-    import type {DomBarElement} from '@/ui/entities/DomBarElement.ts';
     import {setElem} from '@/ui/renderer/utils/setElem.ts';
+    import type {DomBarDto} from '@/ui/entities/DomBarElement.ts';
 
-    const props = defineProps<{ entity: DomBarElement }>();
+    const props = defineProps<{ dto: DomBarDto }>();
     const root = useTemplateRef<HTMLDivElement>('root');
-    const height = computed<number>(() => props.entity.height);
-    const thumbWidth = computed<string>(() => props.entity.progress + '%');
+    const height = computed<number>(() => props.dto.height ?? 2);
+    const thumbWidth = computed<string>(() => props.dto.progress + '%');
 
-    setElem(root, props.entity);
+    setElem(root, props.dto.id);
 </script>
 
 <style lang="less">

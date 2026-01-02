@@ -1,8 +1,9 @@
-import {DomElement} from '@/ui/entities/abstract/DomElement.ts';
+import {DomElement, type DomElementDto, DomPositionAnchor} from '@/ui/entities/abstract/DomElement.ts';
 import {DomElementType} from '@/ui/components/DomComponent.ts';
 import {Color, Engine, type EntityEvents, type EventKey, GameEvent, type Handler, type Subscription, Timer} from 'excalibur';
 import {UiColor} from '@/ui/Ui.ts';
 import {GAME} from '@/main.ts';
+import {type Reactive, reactive} from 'vue';
 
 export class TimerTimoutEvent<T> extends GameEvent<T> {
     engine: Engine;
@@ -18,13 +19,22 @@ export interface DomBarEvents extends EntityEvents {
     timertimout: TimerTimoutEvent<DomBarElement>;
 }
 
+export interface DomBarDto extends DomElementDto {
+    type: typeof DomElementType.Bar;
+    color?: string;
+    progress?: number;
+    height?: number;
+}
+
 export class DomBarElement extends DomElement {
     public name = `DomBar#${this.id}`;
 
-    public colors: Record<number, Color> = {100: UiColor.Accent};
-    public progress: number = 100;
-    public height: number = 2;
-
+    protected _dto: Reactive<DomBarDto> = reactive({
+        type: DomElementType.Bar,
+        anchor: DomPositionAnchor.Center,
+        id: this.id,
+    });
+    protected _colors: Record<number, Color> = {100: UiColor.Accent};
     protected _timer?: Timer;
 
     constructor() {
@@ -36,7 +46,7 @@ export class DomBarElement extends DomElement {
      * @param colors
      */
     public setColors(colors: Record<number, Color>): this {
-        this.colors = colors;
+        this._colors = colors;
         return this;
     }
 
@@ -46,7 +56,7 @@ export class DomBarElement extends DomElement {
      * @param color
      */
     public setColor(progress: number, color: Color): this {
-        this.colors[progress] = color;
+        this._colors[progress] = color;
         return this;
     }
 
@@ -57,7 +67,9 @@ export class DomBarElement extends DomElement {
      * @param silent
      */
     public setProgress(progress: number, silent: boolean = false): this {
-        this.progress = progress;
+        this._dto.progress = progress;
+
+        // todo вычислять цвет на основе прогресса чтобы он плавно менялся
 
         if (progress <= 0 && !silent) {
             this.emit('timertimout', new TimerTimoutEvent<DomBarElement>(GAME, this));
@@ -124,7 +136,7 @@ export class DomBarElement extends DomElement {
      * @param height
      */
     public setHeight(height: number): this {
-        this.height = height;
+        this._dto.height = height;
         return this;
     }
 
