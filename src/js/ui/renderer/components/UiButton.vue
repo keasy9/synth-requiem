@@ -1,43 +1,47 @@
 <template>
     <button
         class="ui-button"
-        @click="props.dto.click()"
-        @focus="props.dto.focus()"
+        @click="props.entity.element.emit(DomEvents.Click)"
+        @focus="props.entity.element.emit(DomEvents.Focus)"
         @mouseenter="onMouseEnter"
         ref="root"
     >
         <span class="ui-button__content">
             <span
                 class="ui-button__html"
-                v-html="dto.content"
+                v-html="entity.content"
             />
         </span>
     </button>
 </template>
 
 <script setup lang="ts">
-    import type {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
     import {computed, useTemplateRef, watch} from 'vue';
     import {Config} from '@/config.ts';
     import {EventBus, Events} from '@/helpers/events/EventBus.ts';
+    import type {DomButtonElement} from '@/ui/entities/DomButtonElement.ts';
+    import {setElem} from '@/ui/renderer/utils/setElem.ts';
+    import {DomEvents} from '@/ui/components/DomComponent.ts';
 
-    const props = defineProps<{ dto: UiButtonDto }>();
+    const props = defineProps<{ entity: DomButtonElement }>();
 
     const root = useTemplateRef<HTMLButtonElement>('root');
-    const padding = computed(() => props.dto.padding.map(p => p * Config.baseScale + 'px').join(' '))
+    const padding = computed(() => props.entity.padding.map(p => p * Config.baseScale + 'px').join(' '));
 
     function onMouseEnter() {
         EventBus.emit(Events.UIButtonUnfocus);
         root.value?.focus();
-        props.dto.focus();
+        props.entity.element.emit(DomEvents.Focus);
     }
 
-    watch(() => props.dto.focused, () => {
-        if (props.dto.focused && !(document.hasFocus() && document.activeElement === root.value)) {
+    watch(() => props.entity.focused, () => {
+        if (props.entity.focused && !(document.hasFocus() && document.activeElement === root.value)) {
             root.value?.focus();
         }
-        else if (!props.dto.focused && document.hasFocus() && document.activeElement === root.value) root.value?.blur();
+        else if (!props.entity.focused && document.hasFocus() && document.activeElement === root.value) root.value?.blur();
     }, {immediate: true});
+
+    setElem(root, props.entity);
 </script>
 
 <style lang="less">

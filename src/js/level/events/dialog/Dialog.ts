@@ -1,19 +1,19 @@
 import type {TimelineEvent} from '@/level/events/interfaces/TimelineEvent.ts';
 import {type Engine, type Sprite, Timer} from 'excalibur';
 import {EventBus, Events} from '@/helpers/events/EventBus.ts';
-import type {UiContainerDto} from '@/ui/dto/UiContainerDto.ts';
-import {ui, UiColor} from '@/ui/Ui.ts';
-import type {UiTextboxDto} from '@/ui/dto/UiTextboxDto.ts';
-import type {UiBarDto} from '@/ui/dto/UiBarDto.ts';
-import {UiAnchor} from '@/ui/dto/UiElemDto.ts';
+import {UiColor} from '@/ui/Ui.ts';
 import type {EnumValue} from '@/utils/types.ts';
-import type {UiSpriteDto} from '@/ui/dto/UiSpriteDto.ts';
 import {sprite} from '@/helpers/graphics/SpriteBuilder.ts';
 import {Resources} from '@/resources.ts';
-import type {Reactive} from 'vue';
+import {type Reactive} from 'vue';
 import {GAME} from '@/main.ts';
-import {UiButtonDto} from '@/ui/dto/UiButtonDto.ts';
-import UiButton from '@/ui/components/UiButton.vue';
+import {DomContainerElement} from '@/ui/entities/DomContainerElement.ts';
+import {DomTextboxElement} from '@/ui/entities/DomTextboxElement.ts';
+import {DomButtonElement} from '@/ui/entities/DomButtonElement.ts';
+import {DomBarElement} from '@/ui/entities/DomBarElement.ts';
+import {DomSpriteElement} from '@/ui/entities/DomSpriteElement.ts';
+import {UiState} from '@/ui/State.ts';
+import {DomEvents, DomPositionAnchor} from '@/ui/components/DomComponent.ts';
 
 const NpcPortrait = {
     Test: 'test',
@@ -29,7 +29,7 @@ type MonologAnswer = {
 export type MonologConf = {
     npc: AnyNpcPortrait,
     name: string,
-    text: string, // todo локализация
+    text: string, // todo локализация?
     answers?: MonologAnswer[],
     nextMonolog?: number, // индекс в monologues родительского диалога
     time?: number,
@@ -40,32 +40,21 @@ export type DialogConf = {
     monologues: MonologConf[],
 }
 
-export class Dialog implements TimelineEvent {
+export class Dialog extends DomContainerElement implements TimelineEvent {
     protected static npcPortraits: Partial<Record<AnyNpcPortrait, Sprite>> = {};
 
     protected isStarted: boolean = false;
     protected conf: DialogConf;
     protected currentMonolog?: MonologConf;
 
-    protected rootContainer?: Reactive<UiContainerDto>;
-    protected textbox?: Reactive<UiTextboxDto>;
-    protected name?: Reactive<UiTextboxDto>;
-    protected buttonsContainer?: Reactive<UiContainerDto<UiButtonDto>>;
-    protected bar?: Reactive<UiBarDto>;
-    protected npcPortrait?: Reactive<UiSpriteDto>;
-
-    protected barTimer?: Timer;
-
-    protected textTimer?: Timer;
-    protected typingInterval: number = 40;
-    protected typingElem?: HTMLElement;
-    protected typingIndexes: number[] = [];
-
-    public static create(conf: DialogConf): Dialog {
-        return new Dialog(conf);
-    }
+    protected textEl?: Reactive<DomTextboxElement>;
+    protected nameEl?: Reactive<DomTextboxElement>;
+    protected buttonsEl?: Reactive<DomContainerElement<DomButtonElement>>;
+    protected barEl?: Reactive<DomBarElement>;
+    protected portraitEl?: Reactive<DomSpriteElement>;
 
     public constructor(conf: DialogConf) {
+        super();
         this.conf = conf;
     }
 
@@ -77,86 +66,58 @@ export class Dialog implements TimelineEvent {
         return this.currentMonolog !== undefined;
     }
 
-    public onPreUpdate(_engine: Engine, _elapsed: number): void {
-        if (this.barTimer && this.bar) {
-            this.bar?.setProgress(this.barTimer.timeToNextAction / this.barTimer.interval * 100);
-        }
-    }
-
     public start(): this {
         this.isStarted = true;
-        this.setMonolog(this.conf.monologues[this.conf.startMonolog]!);
 
         EventBus.emit(Events.DialogStarted);
 
+        GAME.add(this);
+
         return this;
+    }
+
+    public onInitialize(engine: Engine) {
+        super.onInitialize(engine);
+
+        this.setMonolog(this.conf.monologues[this.conf.startMonolog]!);
+
+        this.setAnchor(DomPositionAnchor.Bottom)
+            .setStyle('gap', 4)
+            .setStyle('padding', 10)
+            .setStyle('grid-template-columns', 'auto 1fr')
+            .setColsLayout()
+            .addChildren(
+                this.portraitEl!,
+                new DomContainerElement()
+                    .setRowsLayout()
+                    .setStyle('padding-top', 19)
+                    .addChildren(
+                        this.nameEl!,
+                        this.barEl!,
+                        this.textEl!,
+                        this.buttonsEl!,
+                    ),
+            );
     }
 
     protected setMonolog(conf: MonologConf): void {
         this.currentMonolog = conf;
 
-        this.setText(conf.text);
         this.setNpc(conf.npc);
+        this.setText(conf.text);
         this.setName(conf.name);
         this.setAnswers(conf.answers ?? []);
         this.resetBar(conf.time);
-
-        this.rootContainer ??= ui()
-            .box()
-            .at(UiAnchor.Bottom)
-            .withGap(4)
-            .withPadding(10)
-            .asCols()
-            .with(
-                this.npcPortrait!,
-                ui()
-                    .box()
-                    .asRows()
-                    .grow()
-                    .withPadding(19, 0, 0, 0)
-                    .with(
-                        this.name!,
-                        this.bar!,
-                        this.textbox!,
-                        this.buttonsContainer!,
-                    ),
-            )
-            .reactive();
-
-        this.rootContainer.addToRoot();
     }
 
     protected setText(text: string): void {
-        if (!this.textbox) {
-            this.textbox = ui().text('')
-                .grow()
-                .withMargin(0, 0, 10, -40)
-                .withPadding(3, 3, 3, 40)
-                .border(1, 0, 0, 0, UiColor.Primary)
-                .reactive();
+        this.textEl ??= new DomTextboxElement()
+            .setStyle('margin', [0, 0, 10, -40])
+            .setStyle('padding', [3, 3, 3, 40])
+            .setStyle('border-top', `1px solid ${UiColor.Primary.toHex()}`)
+            .reactive();
 
-        } else {
-            this.textbox.content = '';
-        }
-
-        if (!this.textTimer) {
-            this.textTimer = new Timer({
-                interval: this.typingInterval,
-                repeats: true,
-                numberOfRepeats: -1,
-                action: () => this.typeText(),
-            });
-
-            GAME.add(this.textTimer);
-        } else {
-            this.textTimer.reset();
-        }
-
-        this.textTimer.start();
-
-        this.typingElem = document.createElement('div');
-        this.typingElem.innerHTML = text;
-        this.typingIndexes = [];
+        this.textEl.animateTyping(40, text, this.onTextTyped.bind(this));
     }
 
     protected setNpc(npc: AnyNpcPortrait): void {
@@ -165,35 +126,28 @@ export class Dialog implements TimelineEvent {
             .autoWidth(1)
             .one();
 
-        if (!this.npcPortrait) {
-            this.npcPortrait = ui()
-                .sprite(Dialog.npcPortraits[npc])
-                .scaleBy(1.5) // для лучшего визуала
-                .reactive();
-        } else {
-            this.npcPortrait.framesFrom(Dialog.npcPortraits[npc]!);
-        }
+        this.portraitEl ??= new DomSpriteElement()
+            .setScale(1.5) // для лучшего визуала
+            .reactive();
+
+        this.portraitEl.framesFrom(Dialog.npcPortraits[npc]!);
     }
 
     protected setName(name: string): void {
-        if (!this.name) {
-            this.name = ui()
-                .text(name)
-                .withMargin(0, 0, 0, -40)
-                .withPadding(3, 8, 6, 40)
-                .border(1, 0, 0, 0, UiColor.Primary)
-                .reactive();
+        this.nameEl = new DomTextboxElement()
+            .setStyle('margin-left', -40)
+            .setStyle('padding', [3, 8, 6, 40])
+            .setStyle('border-top', `1px solid ${UiColor.Primary.toHex()}`)
+            .reactive();
 
-        } else {
-            this.name.content = name;
-        }
+        this.nameEl.setContent(name)
     }
 
     protected setAnswers(answers: MonologAnswer[]): void {
-        this.buttonsContainer ??= ui().box().withGap(3).reactive();
+        this.buttonsEl ??= new DomContainerElement<DomButtonElement>().setStyle('gap', 3).reactive();
 
-        this.buttonsContainer.children = answers.map(answer => {
-            const btn = ui().button().html(answer.text).reactive();
+        this.buttonsEl.addChildren(...answers.map(answer => {
+            const btn = new DomButtonElement().setContent(answer.text).reactive();
 
             let cb;
 
@@ -204,20 +158,21 @@ export class Dialog implements TimelineEvent {
                 cb = this.end.bind(this);
             }
 
-            btn.callback(() => {
+            btn.on(DomEvents.Click, () => {
                 // 1) блокируем взаимодействие с диалогом
-                this.rootContainer?.interactive(false);
+                this.setStyle('pointer-events', 'none');
 
                 // 2) останавливаем таймер на выбор ответа и анимацию печати текста
-                this.barTimer?.pause();
-                this.textTimer?.stop();
-                this.textbox.content = this.currentMonolog?.text;
+                this.textEl?.stopAnimation();
+                this.barEl?.pause();
 
                 // 3) запускаем таймер моргания кнопки
+                let visible = true;
                 const blinkTimer = new Timer({
                     interval: 80,
                     action: () => {
-                        btn.visible = !btn.visible
+                        visible = !visible;
+                        btn.setStyle('visibility', visible ? 'visible' : 'hidden');
                     },
                     repeats: true,
                     numberOfRepeats: 7,
@@ -231,7 +186,7 @@ export class Dialog implements TimelineEvent {
                     interval: 560,
                     action: () => {
                         cb();
-                        this.rootContainer?.interactive(true);
+                        this.clearStyle('pointer-events');
                     },
                 });
 
@@ -240,107 +195,37 @@ export class Dialog implements TimelineEvent {
             });
 
             return btn;
-        });
+        }));
     }
 
     protected resetBar(time?: number): void {
+        this.barEl ??= new DomBarElement()
+            .setColor(20, UiColor.Danger)
+            .setStyle('margin-left', -40)
+            .reactive();
+
         if (time) {
-            if (!this.bar) {
-                this.bar = ui().bar()
-                    .paintAt(20, UiColor.Danger)
-                    .withMargin(0, 0, 0, -40)
-                    .reactive();
-            } else {
-                this.bar.setProgress(100);
-            }
-
-            if (!this.barTimer) {
-                this.barTimer = new Timer({
-                    interval: time,
-                    action: () => {
-                        (
-                            this.buttonsContainer?.children.find(btn => btn.focused)
-                            ?? this.buttonsContainer?.children[0]
-                        ).click();
-                    }
-                });
-                GAME.add(this.barTimer);
-            } else {
-                this.barTimer.reset(time);
-            }
-
+            this.barEl
+                .initTimer(time, () => (
+                    this.buttonsEl?.children.find(btn => btn.focused)
+                    ?? this.buttonsEl?.children[0]
+                )?.element.emit(DomEvents.Click))
+                .setProgress(100)
+                .setStyle('visibility', 'visible');
         } else {
-            this.bar?.hide();
+            this.barEl.setStyle('visibility', 'hidden');
         }
+    }
+
+    public onTextTyped(): void {
+        this.barEl?.start();
     }
 
     protected end(): void {
-        this.rootContainer?.hide();
+        delete UiState[this.id];
+
         this.isStarted = false;
         delete this.currentMonolog;
         EventBus.emit(Events.DialogEnded);
-    }
-
-    protected sliceContent(elem: HTMLElement, level: number = 0): string {
-        this.typingIndexes[level] ??= 0;
-        const currentIndex = this.typingIndexes[level];
-
-        if (elem.nodeName === '#text') {
-            // сейчас печатается текст
-
-            if (currentIndex >= elem.textContent.length - 1) {
-                // вместо добавления последнего символа выводим весь текст
-                this.typingIndexes = this.typingIndexes.slice(0, -1);
-                if (this.typingIndexes.length) this.typingIndexes[level - 1]!++;
-                return elem.textContent;
-            }
-
-            this.typingIndexes[level]++;
-
-            return elem.textContent.slice(0, currentIndex + 1);
-
-        } else {
-            // печатается вложенный элемент
-
-            if (currentIndex >= elem.childNodes.length) {
-                this.typingIndexes = this.typingIndexes.slice(0, -1);
-                if (this.typingIndexes.length) this.typingIndexes[level - 1]!++;
-
-                if (level === 0) {
-                    this.textTimer?.stop();
-
-                    if (this.currentMonolog?.time) {
-                        this.barTimer?.start(); // текст напечатался, пора запускать таймер на ответ
-                    }
-
-                    return elem.innerHTML;
-                }
-
-                return elem.outerHTML;
-            }
-
-            const textParts = ([...elem.childNodes] as HTMLElement[])
-                .slice(0, currentIndex)
-                .map(el => el.nodeName === '#text' ? el.textContent : el.outerHTML);
-
-            // todo сейчас когда элемент полностью напечатался, два раза возвращается одна и та же строка
-            textParts.push(this.sliceContent(elem.childNodes[currentIndex] as HTMLElement, level + 1));
-
-            if (level === 0) return textParts.join('');
-
-            const elemClone = elem.cloneNode(false) as HTMLElement;
-            elemClone.innerHTML = textParts.join('');
-            return elemClone.outerHTML;
-        }
-    }
-
-    protected typeText(): void {
-        if (!this.typingElem || !this.textbox) return;
-
-        // начинаем с первого индекса первого элемента
-        if (this.typingIndexes.length < 1) this.typingIndexes.push(0);
-        if (this.typingIndexes.length < 2) this.typingIndexes.push(0);
-
-        this.textbox.content = this.sliceContent(this.typingElem);
     }
 }

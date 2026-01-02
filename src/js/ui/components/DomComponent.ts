@@ -1,5 +1,7 @@
 import {Component, type Eventable, EventEmitter, type Handler} from 'excalibur';
-import {DomBlurEvent, DomClickEvent, DomFocusEvent, DomMouseEnterEvent, DomMouseLeaveEvent} from '@/helpers/events/DomEvents.ts';
+import {DomBlurEvent, DomClickEvent, DomFocusEvent, DomMouseEnterEvent, DomMouseLeaveEvent} from '@/ui/events/DomEvents.ts';
+import type {EnumValue} from '@/utils/types.ts';
+import {Config} from '@/config.ts';
 
 interface DomComponentEvents {
     focus: DomFocusEvent;
@@ -9,7 +11,7 @@ interface DomComponentEvents {
     mouseleave: DomMouseLeaveEvent;
 }
 
-const DomEvents = {
+export const DomEvents = {
     Focus: 'focus',
     Blur: 'blur',
     Click: 'click',
@@ -37,7 +39,9 @@ export const DomElementType = {
     Textbox: 'textbox',
 } as const;
 
-export abstract class DomComponent extends Component implements Eventable {
+export type AnyDomElementType = EnumValue<DomElementType>;
+
+export class DomComponent extends Component implements Eventable {
     /**
      * Dom элемент.
      * @protected
@@ -53,7 +57,7 @@ export abstract class DomComponent extends Component implements Eventable {
     /**
      * Тип элемента.
      */
-    protected _type: typeof DomPositionAnchor[keyof typeof DomPositionAnchor] = DomPositionAnchor.Center;
+    protected _type: AnyDomElementType;
 
     /**
      * Позиция элемента. Учитывается только у абсолютно-позиционированных элементов (без родителя).
@@ -78,10 +82,26 @@ export abstract class DomComponent extends Component implements Eventable {
     public set element(element: undefined|HTMLElement) {
         this.destroyEvents();
 
+        delete this._element?.exEntity;
+
         this._element = element;
+
+        this._element.exEntity = this;
 
         this.initEvents();
         this.applyQueuedStyles();
+    }
+
+    /**
+     * Тип элемента.
+     */
+    public get type(): AnyDomElementType {
+        return this._type;
+    }
+
+    public constructor(type: AnyDomElementType) {
+        super();
+        this._type = type;
     }
 
     /**
@@ -206,16 +226,38 @@ export abstract class DomComponent extends Component implements Eventable {
 
     /**
      * Установить стили элемента. Если dom-элемент ещё не создан, стили будут применены к нему сразу после создания.
+     * Рекомендуется использовать одноимённый метод сущности-владельца, т.к. он учитывает специфику конкретного элемента.
+     * В качестве значения можно передать число или массив чисел для таких свойств как padding, margin, border-width.
      * @param key
      * @param value
      */
-    public setStyle(key: string, value: string): this {
+    public setStyle(key: string, value: string|number|number[]): this {
+        // замена реальных пикселей на игровые
+        if (typeof value === 'string') {
+            value = value.replace(/(\d)px/g, (_: string, px: string) => Number(px) * Config.baseScale + 'px');
+
+        } else if (typeof value === 'number') {
+            value = value * Config.baseScale + 'px';
+
+        } else {
+            value = value.map(px => px * Config.baseScale + 'px').join(' ');
+        }
+
         if (this._element) this._element.style.setProperty(key, value);
         else this._queuedStyles[key] = value;
 
         return this;
     }
 
-    // todo сеттеры и геттеры для часто используемых стилей
-    // todo потомки этого класса с разными типами элементов и уникальной логикой в зависимости от типа
+    /**
+     * Сбросить стили элемента.
+     * Рекомендуется использовать одноимённый метод сущности-владельца, т.к. он учитывает специфику конкретного элемента.
+     * @param key
+     */
+    public clearStyle(key: string): this {
+        if (this._element) this._element.style.removeProperty(key);
+        else delete this._queuedStyles[key];
+
+        return this;
+    }
 }

@@ -1,9 +1,4 @@
-import {UiElemDto} from '@/ui/dto/UiElemDto.ts';
 import {type Reactive, reactive} from 'vue';
+import type {DomElement} from '@/ui/entities/abstract/DomElement.ts';
 
-export const UiState = reactive<Record<string, Reactive<UiElemDto>>>({})
-
-let nextElemId = 1;
-export function getElemId(): number {
-    return nextElemId++;
-}
+export const UiState = reactive<Record<string, Reactive<DomElement>>>({})

@@ -46,7 +46,7 @@ export class Timeline implements OnPreUpdate {
                 case TimelineEventType.Dialog:
                     return {
                         time: time,
-                        event: Dialog.create(eventConf.conf),
+                        event: new Dialog(eventConf.conf),
                     };
             }
         }).sort((a, b) => a.time - b.time);

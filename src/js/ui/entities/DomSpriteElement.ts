@@ -1,4 +1,5 @@
-import {UiElemDto} from '@/ui/dto/UiElemDto.ts';
+import {DomElement} from '@/ui/entities/abstract/DomElement.ts';
+import {DomElementType} from '@/ui/components/DomComponent.ts';
 import {Animation, AnimationStrategy, Sprite} from 'excalibur';
 
 export type SpriteFrameDto = {
@@ -9,7 +10,9 @@ export type SpriteFrameDto = {
     height: number,
 };
 
-export class UiSpriteDto extends UiElemDto {
+export class DomSpriteElement extends DomElement {
+    public name = `DomSprite#${this.id}`;
+
     public frames: SpriteFrameDto[] = [];
     public frameDuration: number = 100;
     public strategy: AnimationStrategy = AnimationStrategy.Freeze;
@@ -17,20 +20,8 @@ export class UiSpriteDto extends UiElemDto {
     public height: number = 0;
     public scale: number = 1;
 
-    /**
-     * Создать из Animation или Sprite.
-     * @todo из SpriteSheet и Sprite[]
-     * @param source
-     */
-    public static make(source?: Animation|Sprite): UiSpriteDto {
-        const instance = new this();
-        if (!source) return instance;
-
-        instance.width = source.width;
-        instance.height = source.height
-        instance.scale = source.scale.x;
-
-        return instance.framesFrom(source);
+    constructor() {
+        super(DomElementType.Sprite);
     }
 
     /**
@@ -64,42 +55,24 @@ export class UiSpriteDto extends UiElemDto {
             }];
         }
 
+        this.width = source.width;
+        this.height = source.height
+        this.scale = source.scale.x;
+
         return this;
     }
 
     /**
-     * Установить скорость проигрывания, если кадров несколько.
-     * @param frameDuration
-     */
-    public speed(frameDuration: number): this {
-        this.frameDuration = frameDuration;
-        return this;
-    }
-
-    /**
-     * Установить кадры.
-     * @param frames
-     */
-    public withFrames(...frames: SpriteFrameDto[]): this {
-        this.frames = frames;
-        return this;
-    }
-
-    /**
-     * Установить тип проигрывания, если кадров несколько.
-     * @param strategy
-     */
-    public type(strategy: AnimationStrategy): this {
-        this.strategy = strategy;
-        return this;
-    }
-
-    /**
-     * Установить масштаб.
+     * Установить масштабирование спрайта.
      * @param scale
      */
-    public scaleBy(scale: number): this {
+    public setScale(scale: number): this {
         this.scale = scale;
+        return this;
+    }
+
+    public addChild(_: DomElement): this {
+        throw new Error('Нельзя добавлять дочерние элементы в спрайт!');
         return this;
     }
 }
