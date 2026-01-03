@@ -14,6 +14,7 @@ export class DomButtonElement extends DomElement {
     protected _dto: Reactive<DomButtonDto> = reactive({
         type: DomElementType.Button,
         anchor: DomPositionAnchor.Center,
+        padding: [1, 1, 1, 1],
         id: this.id,
     });
 

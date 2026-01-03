@@ -48,11 +48,11 @@ export class Dialog extends DomContainerElement implements TimelineEvent {
     protected conf: DialogConf;
     protected currentMonolog?: MonologConf;
 
-    protected textEl?: Reactive<DomTextboxElement>;
-    protected nameEl?: Reactive<DomTextboxElement>;
-    protected buttonsEl?: Reactive<DomContainerElement<DomButtonElement>>;
-    protected barEl?: Reactive<DomBarElement>;
-    protected portraitEl?: Reactive<DomSpriteElement>;
+    protected textEl?: DomTextboxElement;
+    protected nameEl?: DomTextboxElement;
+    protected buttonsEl?: DomContainerElement<DomButtonElement>;
+    protected barEl?: DomBarElement;
+    protected portraitEl?: DomSpriteElement;
 
     public constructor(conf: DialogConf) {
         super();
@@ -92,6 +92,7 @@ export class Dialog extends DomContainerElement implements TimelineEvent {
                 new DomContainerElement()
                     .setRowsLayout()
                     .setStyle('padding-top', 19)
+                    .setStyle('grid-template-rows', 'auto auto 1fr auto')
                     .addChildren(
                         this.nameEl!,
                         this.barEl!,
@@ -143,6 +144,8 @@ export class Dialog extends DomContainerElement implements TimelineEvent {
     protected setAnswers(answers: MonologAnswer[]): void {
         this.buttonsEl ??= new DomContainerElement<DomButtonElement>().setStyle('gap', 3);
 
+        this.buttonsEl.removeAllChildren();
+
         this.buttonsEl.addChildren(...answers.map(answer => {
             const btn = new DomButtonElement().setContent(answer.text);
 
@@ -155,7 +158,7 @@ export class Dialog extends DomContainerElement implements TimelineEvent {
                 cb = this.end.bind(this);
             }
 
-            btn.on(DomEvents.Click, () => {
+            btn.element.on(DomEvents.Click, () => {
                 // 1) блокируем взаимодействие с диалогом
                 this.setStyle('pointer-events', 'none');
 

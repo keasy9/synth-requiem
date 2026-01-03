@@ -129,19 +129,19 @@ export class DomComponent extends Component implements Eventable {
 
         switch (ev.type) {
             case DomEvents.Focus:
-                this.events.emit(DomEvents.Focus, new DomFocusEvent(this, this._element, ev))
+                this.emit(DomEvents.Focus, new DomFocusEvent(this, this._element, ev))
                 break;
             case DomEvents.Blur:
-                this.events.emit(DomEvents.Focus, new DomBlurEvent(this, this._element, ev))
+                this.emit(DomEvents.Blur, new DomBlurEvent(this, this._element, ev))
                 break;
             case DomEvents.Click:
-                this.events.emit(DomEvents.Focus, new DomClickEvent(this, this._element, ev))
+                this.emit(DomEvents.Click, new DomClickEvent(this, this._element, ev))
                 break;
             case DomEvents.MouseLeave:
-                this.events.emit(DomEvents.Focus, new DomMouseEnterEvent(this, this._element, ev))
+                this.emit(DomEvents.MouseLeave, new DomMouseEnterEvent(this, this._element, ev))
                 break;
             case DomEvents.MouseEnter:
-                this.events.emit(DomEvents.Focus, new DomMouseLeaveEvent(this, this._element, ev))
+                this.emit(DomEvents.MouseEnter, new DomMouseLeaveEvent(this, this._element, ev))
                 break;
         }
     }

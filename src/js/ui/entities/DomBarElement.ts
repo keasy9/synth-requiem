@@ -33,6 +33,7 @@ export class DomBarElement extends DomElement {
         type: DomElementType.Bar,
         anchor: DomPositionAnchor.Center,
         id: this.id,
+        color: UiColor.Accent.toHex(),
     });
     protected _colors: Record<number, Color> = {100: UiColor.Accent};
     protected _timer?: Timer;
@@ -57,6 +58,7 @@ export class DomBarElement extends DomElement {
      */
     public setColor(progress: number, color: Color): this {
         this._colors[progress] = color;
+        this.computeColor();
         return this;
     }
 
@@ -69,7 +71,7 @@ export class DomBarElement extends DomElement {
     public setProgress(progress: number, silent: boolean = false): this {
         this._dto.progress = progress;
 
-        // todo вычислять цвет на основе прогресса чтобы он плавно менялся
+        this._dto.color = this.computeColor().toHex();
 
         if (progress <= 0 && !silent) {
             this.emit('timertimout', new TimerTimoutEvent<DomBarElement>(GAME, this));
@@ -85,7 +87,11 @@ export class DomBarElement extends DomElement {
      */
     public initTimer(time: number, action?: Handler<DomBarEvents['timertimout']>): this {
         if (!this._timer) {
-            this._timer = new Timer({interval: time});
+            this._timer = new Timer({
+                interval: time,
+                action: () => this.setProgress(0),
+            });
+
             GAME.add(this._timer);
         } else {
             this._timer.interval = time;
@@ -176,5 +182,43 @@ export class DomBarElement extends DomElement {
     public off<TEventName extends EventKey<DomBarEvents>>(eventName: TEventName, handler?: Handler<DomBarEvents[TEventName]>): void {
         //@ts-ignore
         super.off(eventName, handler);
+    }
+
+    protected computeColor(): Color {
+        // если цвет один, то его и возвращаем
+        const colors = Object.entries(this._colors);
+        if (colors.length === 1) return colors[0]![1];
+
+        const currentProgress = this._dto.progress ?? 100;
+
+        let prevColor: Color;
+        let nextColor: Color = colors[0]![1];
+
+        let prevProgress: number;
+        let nextProgress: number;
+
+        // числовые ключи в объекте сортируются в порядке возрастания автоматически
+        for (const progress in this._colors) {
+            const color = this._colors[progress]!;
+            if (progress > currentProgress) {
+                prevColor = color;
+                prevProgress = progress;
+                break;
+            }
+
+            nextProgress = progress;
+            nextColor = color;
+        }
+
+        if (!prevColor || prevColor.toHex() === nextColor.toHex()) return nextColor;
+
+        const delta = (currentProgress - prevProgress) / (nextProgress - prevProgress);
+
+        return new Color(
+            prevColor.r + delta * (nextColor.r - prevColor.r),
+            prevColor.g + delta * (nextColor.g - prevColor.g),
+            prevColor.b + delta * (nextColor.b - prevColor.b),
+            prevColor.a + delta * (nextColor.a - prevColor.a),
+        );
     }
 }

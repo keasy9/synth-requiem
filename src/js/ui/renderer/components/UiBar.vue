@@ -13,6 +13,7 @@
     const root = useTemplateRef<HTMLDivElement>('root');
     const height = computed<number>(() => props.dto.height ?? 2);
     const thumbWidth = computed<string>(() => props.dto.progress + '%');
+    const color = computed(() => props.dto.color);
 
     setElem(root, props.dto.id);
 </script>
@@ -31,6 +32,7 @@
 
         &__thumb {
             width: v-bind(thumbWidth);
+            background: v-bind(color);
         }
     }
 </style>
