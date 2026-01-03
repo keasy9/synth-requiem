@@ -4,6 +4,7 @@ import type {EnumValue} from '@/utils/types.ts';
 import {UiDtoState, UiElementsState} from '@/ui/State.ts';
 import type {Reactive} from 'vue';
 import {reactive, toValue} from 'vue';
+import type {Entity} from 'excalibur';
 
 export const DomContainerLayout = {
     Rows: 'rows',
@@ -53,7 +54,7 @@ export class DomContainerElement<TChildren extends DomElement = DomElement> exte
 
     /**
      * Добавить элементы в контейнер.
-     * @param entity
+     * @param entities
      */
     public addChildren<TChild extends DomElement = DomElement>(...entities: TChild[]): DomContainerElement<TChild | TChildren> {
         entities.forEach(child => this.addChild(child));
@@ -69,6 +70,16 @@ export class DomContainerElement<TChildren extends DomElement = DomElement> exte
         delete UiElementsState[entity.id];
 
         return super.removeChild(entity) as this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public removeAllChildren(): Entity {
+        this._dto.children?.forEach(el => delete UiElementsState[el.id]);
+        this._dto.children = [];
+
+        return super.removeAllChildren();
     }
 
     /**

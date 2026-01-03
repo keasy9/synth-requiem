@@ -68,6 +68,7 @@
         --trans-time: .3s;
         --trans-ease: ease;
 
+        font-family: "small", Arial, serif;
         position: absolute;
         top: 0;
         left: 0;
